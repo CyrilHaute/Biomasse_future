@@ -47,3 +47,9 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+.positai
+
+results/migration_ensemble8.rds
+results/withoutmigration_ensemble8.rds
+data/
+results/biomass_baseline_future_hist8
