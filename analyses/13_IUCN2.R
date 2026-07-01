@@ -14,6 +14,19 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
+species_to_remove <- c("Acanthurus achilles", "Acanthurus olivaceus", "Acanthurus pyroferus", "Chaetodon kleinii", "Cheilinus chlorourus",
+                       "Cheilinus fasciatus", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
+                       "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", "Novaculichthys taeniourus",
+                       "Parapercis australis", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri",
+                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Scarus oviceps", "Stegastes nigricans",
+                       "Thalassoma amblycephalum")
+species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
+list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
+
+which_species_to_remove <- which(list_species %in% species_to_remove)
+
+migration_ensemble <- migration_ensemble[-which_species_to_remove]
+
 delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
   
   future_pred_unlog <- future_pred_scale_function(data = migration_ensemble[i],
@@ -27,9 +40,7 @@ delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i)
   
 }, mc.cores = parallel::detectCores() - 1)
 delta_species_bind <- do.call(rbind, delta_species) |> 
-  dplyr::mutate(model = "full") |> 
-  dplyr::filter(delta < 200,
-                delta > -100)
+  dplyr::mutate(model = "full")
 
 
 load("data/raw/1c_species_traits_final.Rdata")
@@ -114,6 +125,7 @@ ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width =
 
 
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
+without_migration_ensemble <- without_migration_ensemble[-which_species_to_remove]
 
 delta_species <- pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
   
@@ -128,9 +140,7 @@ delta_species <- pbmcapply::pbmclapply(1:length(without_migration_ensemble), fun
   
 }, mc.cores = parallel::detectCores() - 1)
 delta_species_bind <- do.call(rbind, delta_species) |> 
-  dplyr::mutate(model = "full") |> 
-  dplyr::filter(delta < 200,
-                delta > -100)
+  dplyr::mutate(model = "full")
 
 load("data/raw/1c_species_traits_final.Rdata")
 species_traits_final <- species_traits_final |> 

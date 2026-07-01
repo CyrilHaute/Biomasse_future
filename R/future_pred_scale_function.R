@@ -86,6 +86,25 @@ future_pred_scale_function <- function(data,
         
         sc_i[,colnames(sc_i) %in% c("2025":"2100")] <- sc_i[,colnames(sc_i) %in% c("2025":"2100")] - biais_correction
         
+        sum_biomass <- lapply(1:length("2024":"2100"), function(j) { 
+          
+          data.frame(year = c("2024":"2100")[j],
+                     sum_biomass = sum(sc_i[colnames(sc_i) %in% c("2024":"2100")[j]]))
+          
+        })
+        sum_biomass_bind <- do.call(rbind, sum_biomass)
+        
+        year_to_correct <- sum_biomass_bind |> 
+          dplyr::filter(sum_biomass <= 0) |> 
+          dplyr::select(year) |> 
+          unlist()
+        
+        if(length(year_to_correct) != 0) {
+          
+          sc_i[,colnames(sc_i) %in% year_to_correct] <- as.data.frame(apply(sc_i[,colnames(sc_i) %in% year_to_correct], 2, function(v) v - sum(v) / length(v)))
+          
+        }
+
       }
       
       sc_i <- sc_i[,!colnames(sc_i) %in% c("scenario", "model")]

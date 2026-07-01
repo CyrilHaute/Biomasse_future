@@ -24,6 +24,17 @@ scenarii <- c("ssp126", "ssp245", "ssp370", "ssp585")
 color_scale <- palette.colors()
 color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], color_scale[7]))
 
+species_to_remove <- c("Acanthurus achilles", "Acanthurus olivaceus", "Acanthurus pyroferus", "Chaetodon kleinii", "Cheilinus chlorourus",
+                       "Cheilinus fasciatus", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
+                       "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", "Novaculichthys taeniourus",
+                       "Parapercis australis", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri",
+                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Scarus oviceps", "Stegastes nigricans",
+                       "Thalassoma amblycephalum")
+species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
+list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
+
+which_species_to_remove <- which(list_species %in% species_to_remove)
+
 
 ### Load models projection
 
@@ -94,7 +105,7 @@ without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
 
 #### Plot figure 1
 
-without_migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = withoutmigration_ensemble,
+without_migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[-which_species_to_remove],
                                                                                                      unit = "kg",
                                                                                                      time = as.character(c("2024":"2075")),
                                                                                                      score = TRUE,
@@ -114,8 +125,8 @@ without_migration_ensemble_plot <- plot_future_pred_scale_function(data = future
                                                                    color_scale = color_scale) +
   theme(legend.position = c(0.7, 0.8),
         legend.direction = "vertical") +
-  scale_y_continuous(limits = c(-45, 5))
-migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble,
+  scale_y_continuous(limits = c(-46, 5))
+migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[-which_species_to_remove],
                                                                                              unit = "kg",
                                                                                              time = as.character(c("2024":"2075")),
                                                                                              score = TRUE,
@@ -135,7 +146,7 @@ migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_sc
                                                            color_scale = color_scale) +
   theme(legend.position = c(0.7, 0.8),
         legend.direction = "vertical") +
-  scale_y_continuous(limits = c(-45, 5))
+  scale_y_continuous(limits = c(-46, 5))
 
 with_vs_without <- patchwork::wrap_plots(without_migration_ensemble_plot + migration_ensemble_plot)
 ggsave(with_vs_without, file = "figures/with_vs_without_pred8.png", width = 10, height = 5)
@@ -144,7 +155,7 @@ ggsave(with_vs_without, file = "figures/with_vs_without_pred8.png", width = 10, 
 
 #### Plot figure SX
 
-rf_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_migration8_full,
+rf_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_migration8_full[-which_species_to_remove],
                                                                              unit = "kg",
                                                                              time = as.character(c("2024":"2075")),
                                                                              biais = TRUE) |> 
@@ -160,8 +171,8 @@ rf_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(dat
                                            breaks = c(2024, 2050, 2075),
                                            color_scale = color_scale,
                                            delta = FALSE,
-                                           y_scale = c(-66, 15))
-rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_full,
+                                           y_scale = c(-69, 15))
+rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_full[-which_species_to_remove],
                                                                                 unit = "kg",
                                                                                 time = as.character(c("2024":"2075")),
                                                                                 biais = FALSE) |> 
@@ -177,8 +188,8 @@ rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(
                                               breaks = c(2024, 2050, 2075),
                                               color_scale = color_scale,
                                               delta = FALSE,
-                                              y_scale = c(-66, 15))
-dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_migration9_full,
+                                              y_scale = c(-69, 15))
+dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_migration9_full[-which_species_to_remove],
                                                                               unit = "kg",
                                                                               time = as.character(c("2024":"2075")),
                                                                               biais = TRUE) |> 
@@ -194,8 +205,8 @@ dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(da
                                             breaks = c(2024, 2050, 2075),
                                             color_scale = color_scale,
                                             delta = FALSE,
-                                            y_scale = c(-66, 15))
-dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_withoutmigration9_full,
+                                            y_scale = c(-69, 15))
+dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                  unit = "kg",
                                                                                  time = as.character(c("2024":"2075")),
                                                                                  biais = FALSE) |> 
@@ -211,8 +222,8 @@ dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function
                                                breaks = c(2024, 2050, 2075),
                                                color_scale = color_scale,
                                                delta = FALSE,
-                                               y_scale = c(-66, 15))
-xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_migration9_full,
+                                               y_scale = c(-69, 15))
+xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_migration9_full[-which_species_to_remove],
                                                                                   unit = "kg",
                                                                                   time = as.character(c("2024":"2075")),
                                                                                   biais = TRUE) |> 
@@ -228,8 +239,8 @@ xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_functio
                                                 breaks = c(2024, 2050, 2075),
                                                 color_scale = color_scale,
                                                 delta = FALSE,
-                                                y_scale = c(-66, 15))
-xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_full,
+                                                y_scale = c(-69, 15))
+xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                      unit = "kg",
                                                                                      time = as.character(c("2024":"2075")),
                                                                                      biais = FALSE) |> 
@@ -245,10 +256,10 @@ xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_func
                                                    breaks = c(2024, 2050, 2075),
                                                    color_scale = color_scale,
                                                    delta = FALSE,
-                                                   y_scale = c(-66, 15))
+                                                   y_scale = c(-69, 15))
 
 
-without_migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pred_scale_function(data = withoutmigration_ensemble,
+without_migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[-which_species_to_remove],
                                                                                                          unit = "kg",
                                                                                                          time = as.character(c("2024":"2075")),
                                                                                                          score = TRUE,
@@ -264,11 +275,11 @@ without_migration_ensemble_plot_all <- plot_future_pred_scale_function(data = fu
                                                                        y_name = "Biomass change (%)",
                                                                        color_lab = "",
                                                                        breaks = c(2024, 2050, 2075),
-                                                                       y_scale = c(-66, 15),
+                                                                       y_scale = c(-69, 15),
                                                                        model_facet = TRUE,
                                                                        delta = FALSE,
                                                                        color_scale = color_scale)
-migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble,
+migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[-which_species_to_remove],
                                                                                                  unit = "kg",
                                                                                                  time = as.character(c("2024":"2075")),
                                                                                                  score = TRUE,
@@ -284,7 +295,7 @@ migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pre
                                                                y_name = "Biomass change (%)",
                                                                color_lab = "",
                                                                breaks = c(2024, 2050, 2075),
-                                                               y_scale = c(-66, 15),
+                                                               y_scale = c(-69, 15),
                                                                model_facet = TRUE,
                                                                delta = FALSE,
                                                                color_scale = color_scale)
@@ -310,11 +321,11 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE) |> 
-                                                         dplyr::group_by(scenario) |> 
+                                                                                         biais = TRUE) |>
+                                                         dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
-                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |> 
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
                                                          dplyr::ungroup(),
                                                        group_name = unique(migration_ensemble[[i]][[1]]$species_name),
                                                        title = unique(migration_ensemble[[i]][[1]]$species_name),

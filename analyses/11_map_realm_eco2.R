@@ -100,6 +100,19 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
+species_to_remove <- c("Acanthurus achilles", "Acanthurus olivaceus", "Acanthurus pyroferus", "Chaetodon kleinii", "Cheilinus chlorourus",
+                       "Cheilinus fasciatus", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
+                       "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", "Novaculichthys taeniourus",
+                       "Parapercis australis", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri",
+                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Scarus oviceps", "Stegastes nigricans",
+                       "Thalassoma amblycephalum")
+species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
+list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
+
+which_species_to_remove <- which(list_species %in% species_to_remove)
+
+migration_ensemble <- migration_ensemble[-which_species_to_remove]
+
 
 future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(i) {
   
@@ -120,11 +133,11 @@ future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(
     
   }, mc.cores = parallel::detectCores() - 1)
   
-  # if(realm_i == "Temperate Australasia"){
-  #   
-  #   ensemble_model_realm <- ensemble_model_realm[-c(375, 380)]
-  #   
-  # }
+  if(realm_i == "Temperate Australasia"){
+
+    ensemble_model_realm <- ensemble_model_realm[-c(373)]
+
+  }
   
   data <- future_pred_scale_function(data = ensemble_model_realm,
                                      unit = "kg",
@@ -169,6 +182,7 @@ ggsave("figures/future_realm_plot_migration_point8/future_pred_eastern_indo-paci
 
 
 withoutmigration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
+withoutmigration_ensemble <- withoutmigration_ensemble[-which_species_to_remove]
 
 future_pred_ecoregion_by_realm_without <- lapply(1:length(unique(test$realm)), function(i) {
   
@@ -189,11 +203,11 @@ future_pred_ecoregion_by_realm_without <- lapply(1:length(unique(test$realm)), f
     
   }, mc.cores = parallel::detectCores() - 1)
   
-  # if(realm_i == "Temperate Australasia"){
-  #   
-  #   ensemble_model_realm <- ensemble_model_realm[-c(375, 380)]
-  #   
-  # }
+  if(realm_i == "Temperate Australasia"){
+
+    ensemble_model_realm <- ensemble_model_realm[-c(373)]
+
+  }
   
   data <- future_pred_scale_function(data = ensemble_model_realm,
                                      unit = "kg",
