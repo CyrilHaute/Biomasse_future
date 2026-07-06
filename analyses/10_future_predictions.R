@@ -24,12 +24,16 @@ scenarii <- c("ssp126", "ssp245", "ssp370", "ssp585")
 color_scale <- palette.colors()
 color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], color_scale[7]))
 
-species_to_remove <- c("Acanthurus achilles", "Acanthurus olivaceus", "Acanthurus pyroferus", "Chaetodon kleinii", "Cheilinus chlorourus",
-                       "Cheilinus fasciatus", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
-                       "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", "Novaculichthys taeniourus",
-                       "Parapercis australis", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri",
-                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Scarus oviceps", "Stegastes nigricans",
-                       "Thalassoma amblycephalum")
+species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
+                       "Amblyglyphidodon curacao",  "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii",
+                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus", 
+                       "Chromis cyanea", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
+                       "Hologymnosus annulatus", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
+                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus",
+                       "Novaculichthys taeniourus", "Parupeneus spilurus", "Plectorhinchus flavomaculatus",
+                       "Plectorhinchus multivittatus", 
+                       "Plectropomus maculatus", "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+                       "Pterocaesio pisang", "Scarus oviceps", "Stegastes nigricans", "Thalassoma amblycephalum")
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 
@@ -92,12 +96,12 @@ migration_ensemble <- score_function(pred_biomass_data = list(biomass_class_futu
                                                               biomass_class_future_xgboost_hist_migration9_full,
                                                               biomass_class_future_dnn_hist_migration9_full),
                                      score_data = performance_bind)
-withoutmigration_ensemble <- score_function(pred_biomass_data = list(biomass_class_future_rf_hist_withoutmigration8_full,
-                                                                     biomass_class_future_xgboost_hist_withoutmigration9_full,
-                                                                     biomass_class_future_dnn_hist_withoutmigration9_full),
-                                            score_data = performance_bind)
+without_migration_ensemble <- score_function(pred_biomass_data = list(biomass_class_future_rf_hist_withoutmigration8_full,
+                                                                      biomass_class_future_xgboost_hist_withoutmigration9_full,
+                                                                      biomass_class_future_dnn_hist_withoutmigration9_full),
+                                             score_data = performance_bind)
 # saveRDS(migration_ensemble, "results/migration_ensemble8.rds")
-# saveRDS(withoutmigration_ensemble, "results/withoutmigration_ensemble8.rds")
+# saveRDS(without_migration_ensemble, "results/withoutmigration_ensemble8.rds")
 
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
@@ -340,6 +344,38 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
   ggsave(future_pred_unlog, filename = paste0(new_dir, unique(migration_ensemble[[i]][[1]]$species_name), ".png"))
   
 }, mc.cores = parallel::detectCores() - 1))
+
+
+
+# without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
+# 
+# new_dir <- "figures/species_specific_without_migration8/"
+# dir.create(new_dir)
+# unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
+#   
+#   future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[i],
+#                                                                                          unit = "kg",
+#                                                                                          time = as.character(c("2024":"2100")),
+#                                                                                          score = TRUE,
+#                                                                                          biais = FALSE) |>
+#                                                          dplyr::group_by(scenario) |>
+#                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
+#                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
+#                                                                        biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+#                                                          dplyr::ungroup(),
+#                                                        group_name = unique(without_migration_ensemble[[i]][[1]]$species_name),
+#                                                        title = unique(without_migration_ensemble[[i]][[1]]$species_name),
+#                                                        x_name = "",
+#                                                        y_name = "Biomass (kg)",
+#                                                        color_lab = "",
+#                                                        model_facet = FALSE,
+#                                                        face = "italic",
+#                                                        breaks = c(2024, 2050, 2100),
+#                                                        color_scale = color_scale)
+#   
+#   ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[[i]][[1]]$species_name), ".png"))
+#   
+# }, mc.cores = parallel::detectCores() - 1))
 
 
 #### Extract projection for Cheilinus undulatus, Anampses twistii and Abudefduf vaigiensis

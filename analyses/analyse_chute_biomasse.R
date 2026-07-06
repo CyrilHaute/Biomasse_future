@@ -102,7 +102,7 @@ summary(baseline_plus_1[baseline_plus_1$scenario == "ssp585",]$gdp)
 
 # Étape 3 : PDP à t0
 
-species_biomass <- list.files("results/biomass_baseline_future_hist5", full.names = TRUE)
+species_biomass <- list.files("results/biomass_baseline_future_hist8", full.names = TRUE)
 
 unlist(pbmcapply::pbmclapply(1:length(species_biomass), function(i) {
   

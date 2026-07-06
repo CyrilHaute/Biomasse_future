@@ -88,22 +88,55 @@ future_pred_scale_function <- function(data,
         
         sum_biomass <- lapply(1:length("2024":"2100"), function(j) { 
           
-          data.frame(year = c("2024":"2100")[j],
-                     sum_biomass = sum(sc_i[colnames(sc_i) %in% c("2024":"2100")[j]]))
+          # data.frame(year = c("2024":"2100")[j],
+          #            sum_biomass = sum(sc_i[colnames(sc_i) %in% c("2024":"2100")[j]]))
+          
+          data_year_j <- sc_i[colnames(sc_i) %in% c("species_name", c("2024":"2100")[j])] |> 
+            dplyr::mutate(year = c("2024":"2100")[j])
+          colnames(data_year_j)[2] <- "biomass"
+          data_year_j <- data_year_j |> 
+            dplyr::group_by(year, species_name) |> 
+            dplyr::mutate(sum_biomass = sum(biomass)) |> 
+            dplyr::select(-biomass) |> 
+            unique()
           
         })
         sum_biomass_bind <- do.call(rbind, sum_biomass)
         
-        year_to_correct <- sum_biomass_bind |> 
-          dplyr::filter(sum_biomass <= 0) |> 
-          dplyr::select(year) |> 
-          unlist()
+        # year_to_correct <- sum_biomass_bind |> 
+        #   dplyr::filter(sum_biomass <= 0) |> 
+        #   dplyr::select(year) |> 
+        #   unlist()
         
-        if(length(year_to_correct) != 0) {
+        year_sp_to_correct <- sum_biomass_bind |> 
+          dplyr::filter(sum_biomass <= 0) |> 
+          dplyr::select(year, species_name)
+        
+        if(nrow(year_sp_to_correct) != 0) {
           
-          sc_i[,colnames(sc_i) %in% year_to_correct] <- as.data.frame(apply(sc_i[,colnames(sc_i) %in% year_to_correct], 2, function(v) v - sum(v) / length(v)))
+          test <- lapply(1:length(unique(year_sp_to_correct$species_name)), function(j) {
+            
+            sp_j <- sc_i |> 
+              dplyr::filter(species_name == unique(year_sp_to_correct$species_name)[j])
+            
+            sp_j[,colnames(sp_j) %in% year_sp_to_correct[year_sp_to_correct$species_name == unique(year_sp_to_correct$species_name)[j],]$year] <- as.data.frame(apply(sp_j[,colnames(sp_j) %in% year_sp_to_correct[year_sp_to_correct$species_name == unique(year_sp_to_correct$species_name)[j],]$year], 2, function(v) v - sum(v) / length(v)))
+            
+          })
+          
+          for(j in 1:length(test)) {
+            
+            sc_i[sc_i$species_name == unique(year_sp_to_correct$species_name)[j],][,colnames(sc_i) %in% year_sp_to_correct[year_sp_to_correct$species_name == unique(year_sp_to_correct$species_name)[j],]$year] <- test[[j]]
+            
+          }
           
         }
+        
+        
+        # if(length(year_to_correct) != 0) {
+        #   
+        #   sc_i[,colnames(sc_i) %in% year_to_correct] <- as.data.frame(apply(sc_i[,colnames(sc_i) %in% year_to_correct], 2, function(v) v - sum(v) / length(v)))
+        #   
+        # }
 
       }
       
