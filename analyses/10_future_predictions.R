@@ -27,13 +27,12 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
                        "Amblyglyphidodon curacao",  "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii",
                        "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus", 
-                       "Chromis cyanea", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
-                       "Hologymnosus annulatus", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
-                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus",
-                       "Novaculichthys taeniourus", "Parupeneus spilurus", "Plectorhinchus flavomaculatus",
-                       "Plectorhinchus multivittatus", 
-                       "Plectropomus maculatus", "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-                       "Pterocaesio pisang", "Scarus oviceps", "Stegastes nigricans", "Thalassoma amblycephalum")
+                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
+                       "Hologymnosus annulatus", "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
+                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", "Parupeneus spilurus", 
+                       "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri", 
+                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Pterocaesio tile", "Pempheris schwenkii", 
+                       "Scarus oviceps", "Stegastes nigricans", "Thalassoma amblycephalum")
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 
@@ -134,7 +133,8 @@ migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_sc
                                                                                              unit = "kg",
                                                                                              time = as.character(c("2024":"2075")),
                                                                                              score = TRUE,
-                                                                                             biais = TRUE) |> 
+                                                                                             biais = TRUE,
+                                                                                             mc.cores = parallel::detectCores() - 1) |> 
                                                              dplyr::group_by(scenario) |> 
                                                              dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                            upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -175,7 +175,7 @@ rf_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(dat
                                            breaks = c(2024, 2050, 2075),
                                            color_scale = color_scale,
                                            delta = FALSE,
-                                           y_scale = c(-69, 15))
+                                           y_scale = c(-70, 15))
 rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_full[-which_species_to_remove],
                                                                                 unit = "kg",
                                                                                 time = as.character(c("2024":"2075")),
@@ -192,7 +192,7 @@ rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(
                                               breaks = c(2024, 2050, 2075),
                                               color_scale = color_scale,
                                               delta = FALSE,
-                                              y_scale = c(-69, 15))
+                                              y_scale = c(-70, 15))
 dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_migration9_full[-which_species_to_remove],
                                                                               unit = "kg",
                                                                               time = as.character(c("2024":"2075")),
@@ -209,7 +209,7 @@ dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(da
                                             breaks = c(2024, 2050, 2075),
                                             color_scale = color_scale,
                                             delta = FALSE,
-                                            y_scale = c(-69, 15))
+                                            y_scale = c(-70, 15))
 dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                  unit = "kg",
                                                                                  time = as.character(c("2024":"2075")),
@@ -226,7 +226,7 @@ dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function
                                                breaks = c(2024, 2050, 2075),
                                                color_scale = color_scale,
                                                delta = FALSE,
-                                               y_scale = c(-69, 15))
+                                               y_scale = c(-70, 15))
 xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_migration9_full[-which_species_to_remove],
                                                                                   unit = "kg",
                                                                                   time = as.character(c("2024":"2075")),
@@ -243,7 +243,7 @@ xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_functio
                                                 breaks = c(2024, 2050, 2075),
                                                 color_scale = color_scale,
                                                 delta = FALSE,
-                                                y_scale = c(-69, 15))
+                                                y_scale = c(-70, 15))
 xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                      unit = "kg",
                                                                                      time = as.character(c("2024":"2075")),
@@ -260,7 +260,7 @@ xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_func
                                                    breaks = c(2024, 2050, 2075),
                                                    color_scale = color_scale,
                                                    delta = FALSE,
-                                                   y_scale = c(-69, 15))
+                                                   y_scale = c(-70, 15))
 
 
 without_migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[-which_species_to_remove],
@@ -279,7 +279,7 @@ without_migration_ensemble_plot_all <- plot_future_pred_scale_function(data = fu
                                                                        y_name = "Biomass change (%)",
                                                                        color_lab = "",
                                                                        breaks = c(2024, 2050, 2075),
-                                                                       y_scale = c(-69, 15),
+                                                                       y_scale = c(-70, 15),
                                                                        model_facet = TRUE,
                                                                        delta = FALSE,
                                                                        color_scale = color_scale)
@@ -287,7 +287,8 @@ migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pre
                                                                                                  unit = "kg",
                                                                                                  time = as.character(c("2024":"2075")),
                                                                                                  score = TRUE,
-                                                                                                 biais = TRUE) |> 
+                                                                                                 biais = TRUE,
+                                                                                                 mc.cores = parallel::detectCores() - 1) |> 
                                                                  dplyr::group_by(scenario) |> 
                                                                  dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                                upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -299,7 +300,7 @@ migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pre
                                                                y_name = "Biomass change (%)",
                                                                color_lab = "",
                                                                breaks = c(2024, 2050, 2075),
-                                                               y_scale = c(-69, 15),
+                                                               y_scale = c(-70, 15),
                                                                model_facet = TRUE,
                                                                delta = FALSE,
                                                                color_scale = color_scale)
@@ -325,7 +326,8 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE) |>
+                                                                                         biais = TRUE,
+                                                                                         mc.cores = 1) |>
                                                          dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -347,35 +349,35 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
 
 
 
-# without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
-# 
-# new_dir <- "figures/species_specific_without_migration8/"
-# dir.create(new_dir)
-# unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
-#   
-#   future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[i],
-#                                                                                          unit = "kg",
-#                                                                                          time = as.character(c("2024":"2100")),
-#                                                                                          score = TRUE,
-#                                                                                          biais = FALSE) |>
-#                                                          dplyr::group_by(scenario) |>
-#                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
-#                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
-#                                                                        biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
-#                                                          dplyr::ungroup(),
-#                                                        group_name = unique(without_migration_ensemble[[i]][[1]]$species_name),
-#                                                        title = unique(without_migration_ensemble[[i]][[1]]$species_name),
-#                                                        x_name = "",
-#                                                        y_name = "Biomass (kg)",
-#                                                        color_lab = "",
-#                                                        model_facet = FALSE,
-#                                                        face = "italic",
-#                                                        breaks = c(2024, 2050, 2100),
-#                                                        color_scale = color_scale)
-#   
-#   ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[[i]][[1]]$species_name), ".png"))
-#   
-# }, mc.cores = parallel::detectCores() - 1))
+without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
+
+new_dir <- "figures/species_specific_without_migration8/"
+dir.create(new_dir)
+unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
+
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[i],
+                                                                                         unit = "kg",
+                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         score = TRUE,
+                                                                                         biais = FALSE) |>
+                                                         dplyr::group_by(scenario) |>
+                                                         dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
+                                                                       upper = (1 - (upper / dplyr::first(biomass))) * - 100,
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+                                                         dplyr::ungroup(),
+                                                       group_name = unique(without_migration_ensemble[[i]][[1]]$species_name),
+                                                       title = unique(without_migration_ensemble[[i]][[1]]$species_name),
+                                                       x_name = "",
+                                                       y_name = "Biomass (kg)",
+                                                       color_lab = "",
+                                                       model_facet = FALSE,
+                                                       face = "italic",
+                                                       breaks = c(2024, 2050, 2100),
+                                                       color_scale = color_scale)
+
+  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[[i]][[1]]$species_name), ".png"))
+
+}, mc.cores = parallel::detectCores() - 1))
 
 
 #### Extract projection for Cheilinus undulatus, Anampses twistii and Abudefduf vaigiensis
@@ -390,7 +392,8 @@ plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2075")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE) |> 
+                                                                                         biais = TRUE,
+                                                                                         mc.cores = parallel::detectCores() - 1) |> 
                                                          dplyr::group_by(scenario) |> 
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * -100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * -100,
@@ -407,7 +410,7 @@ plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
                                                        model_facet = FALSE,
                                                        color_scale = color_scale)
 
-}, mc.cores = parallel::detectCores() - 1)
+}, mc.cores = 1)
 
 c_un <- magick::image_read("data/raw/image_fish/cheilinus_undulatus.jpg")
 a_tw <- magick::image_read("data/raw/image_fish/anampses_twistii.jpg")
