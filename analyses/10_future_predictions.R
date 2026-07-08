@@ -430,12 +430,14 @@ ggsave(plot_species_patch, filename = "figures/plot_species_patch_migration8.png
 
 
 
-delta_realm_migration <- future_pred_scale_function(data = migration_ensemble[-c(375, 380)],
+delta_realm_migration <- future_pred_scale_function(data = migration_ensemble[-which_species_to_remove],
                                                     unit = "kg",
                                                     time = as.character(c("2024":"2075")),
                                                     scale = "realm",
                                                     to_remove = 0,
-                                                    score = TRUE)
+                                                    score = TRUE,
+                                                    biais = TRUE,
+                                                    mc.cores = parallel::detectCores() - 1)
 delta_realm_s_migration <- delta_realm_migration |> 
   dplyr::ungroup() |> 
   dplyr::select(scale, delta, scenario) |> 

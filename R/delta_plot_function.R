@@ -20,9 +20,9 @@ delta_plot_function <- function(delta_species_bind){
                                            "SSP2-4.5" = "2",
                                            "SSP3-7.0" = "3",
                                            "SSP5-8.5" = "4"),
-                  y = dplyr::case_when(stability == "Decrease" ~ 250,
-                                       stability == "Increase" ~ 300,
-                                       stability == "Stable" ~ 275))
+                  y = dplyr::case_when(stability == "Decrease" ~ 150,
+                                       stability == "Increase" ~ 200,
+                                       stability == "Stable" ~ 175))
   
   n_delta$scenario <- as.numeric(n_delta$scenario)
   
@@ -90,10 +90,10 @@ delta_plot_function <- function(delta_species_bind){
                                     "SSP5-8.5" = "4"))
   
   delta_species_plot_text <- delta_species_plot + 
-    # geom_text(data = n_delta,
-    #           aes(x = scenario + 0.2, y = y, label = n, color = stability),
-    #           size = 4.5, 
-    #           show.legend = FALSE) +
+    geom_text(data = n_delta,
+              aes(x = scenario + 0.2, y = y, label = n, color = stability),
+              size = 5,
+              show.legend = FALSE) +
     scale_color_manual(values = RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")[c(1,10,4)]) +
     scale_x_continuous(breaks = 1:4, labels = c("SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5"))
   

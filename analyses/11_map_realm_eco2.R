@@ -135,13 +135,7 @@ future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(
     })
     
   }, mc.cores = parallel::detectCores() - 1)
-  
-  # if(realm_i == "Temperate Australasia"){
-  # 
-  #   ensemble_model_realm <- ensemble_model_realm[-c(373)]
-  # 
-  # }
-  
+
   data <- future_pred_scale_function(data = ensemble_model_realm,
                                      unit = "kg",
                                      time = as.character(c("2024":"2075")),
@@ -206,13 +200,7 @@ future_pred_ecoregion_by_realm_without <- lapply(1:length(unique(test$realm)), f
     })
     
   }, mc.cores = parallel::detectCores() - 1)
-  
-  # if(realm_i == "Temperate Australasia"){
-  # 
-  #   ensemble_model_realm <- ensemble_model_realm[-c(373)]
-  # 
-  # }
-  
+
   data <- future_pred_scale_function(data = ensemble_model_realm,
                                      unit = "kg",
                                      time = as.character(c("2024":"2075")),
@@ -253,3 +241,32 @@ ggsave("figures/future_realm_plot_without_migration_point/future_pred_western_in
 ggsave("figures/future_realm_plot_without_migration_point/future_pred_temperate_northern_atlantic.png", future_pred_ecoregion_by_realm_without[[5]], width = 4, height = 4)
 ggsave("figures/future_realm_plot_without_migration_point/future_pred_tropical_eastern_pacific.png", future_pred_ecoregion_by_realm_without[[6]], width = 4, height = 4)
 ggsave("figures/future_realm_plot_without_migration_point/future_pred_eastern_indo-pacific.png", future_pred_ecoregion_by_realm_without[[7]], width = 4, height = 4)
+
+
+delta_realm_migration <- future_pred_scale_function(data = migration_ensemble[-which_species_to_remove],
+                                                    unit = "kg",
+                                                    time = as.character(c("2024":"2075")),
+                                                    scale = "realm",
+                                                    to_remove = 0,
+                                                    score = TRUE,
+                                                    biais = TRUE,
+                                                    mc.cores = parallel::detectCores() - 1)
+delta_realm_s_migration <- delta_realm_migration |> 
+  dplyr::ungroup() |> 
+  dplyr::select(scale, delta, scenario) |> 
+  unique() |> 
+  dplyr::group_split(scenario)
+
+delta_realm_without_migration <- future_pred_scale_function(data = withoutmigration_ensemble[-which_species_to_remove],
+                                                            unit = "kg",
+                                                            time = as.character(c("2024":"2075")),
+                                                            scale = "realm",
+                                                            to_remove = 0,
+                                                            score = TRUE,
+                                                            biais = FALSE,
+                                                            mc.cores = parallel::detectCores() - 1)
+delta_realm_s_without_migration <- delta_realm_without_migration |> 
+  dplyr::ungroup() |> 
+  dplyr::select(scale, delta, scenario) |> 
+  unique() |> 
+  dplyr::group_split(scenario)
