@@ -25,14 +25,16 @@ color_scale <- palette.colors()
 color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], color_scale[7]))
 
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
-                       "Amblyglyphidodon curacao",  "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii",
-                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus", 
-                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
-                       "Hologymnosus annulatus", "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
-                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", "Parupeneus spilurus", 
-                       "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri", 
-                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Pterocaesio tile", "Pempheris schwenkii", 
-                       "Scarus oviceps", "Stegastes nigricans", "Thalassoma amblycephalum")
+                       "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
+                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
+                       "Chromis cyanea", "Chrysiptera rollandi", "Epinephelus daemelii", "Fistularia commersonii", 
+                       "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
+                       "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
+                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
+                       "Parupeneus spilurus", "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", 
+                       "Plectropomus maculatus", "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+                       "Pterocaesio pisang", "Pterocaesio tile", "Scarus oviceps", "Stegastes nigricans", 
+                       "Thalassoma amblycephalum")
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 
@@ -175,7 +177,7 @@ rf_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(dat
                                            breaks = c(2024, 2050, 2075),
                                            color_scale = color_scale,
                                            delta = FALSE,
-                                           y_scale = c(-70, 15))
+                                           y_scale = c(-81, 37))
 rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_full[-which_species_to_remove],
                                                                                 unit = "kg",
                                                                                 time = as.character(c("2024":"2075")),
@@ -192,7 +194,7 @@ rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(
                                               breaks = c(2024, 2050, 2075),
                                               color_scale = color_scale,
                                               delta = FALSE,
-                                              y_scale = c(-70, 15))
+                                              y_scale = c(-81, 37))
 dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_migration9_full[-which_species_to_remove],
                                                                               unit = "kg",
                                                                               time = as.character(c("2024":"2075")),
@@ -209,7 +211,7 @@ dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(da
                                             breaks = c(2024, 2050, 2075),
                                             color_scale = color_scale,
                                             delta = FALSE,
-                                            y_scale = c(-70, 15))
+                                            y_scale = c(-81, 37))
 dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                  unit = "kg",
                                                                                  time = as.character(c("2024":"2075")),
@@ -226,7 +228,7 @@ dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function
                                                breaks = c(2024, 2050, 2075),
                                                color_scale = color_scale,
                                                delta = FALSE,
-                                               y_scale = c(-70, 15))
+                                               y_scale = c(-81, 37))
 xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_migration9_full[-which_species_to_remove],
                                                                                   unit = "kg",
                                                                                   time = as.character(c("2024":"2075")),
@@ -243,7 +245,7 @@ xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_functio
                                                 breaks = c(2024, 2050, 2075),
                                                 color_scale = color_scale,
                                                 delta = FALSE,
-                                                y_scale = c(-70, 15))
+                                                y_scale = c(-81, 37))
 xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                      unit = "kg",
                                                                                      time = as.character(c("2024":"2075")),
@@ -260,7 +262,7 @@ xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_func
                                                    breaks = c(2024, 2050, 2075),
                                                    color_scale = color_scale,
                                                    delta = FALSE,
-                                                   y_scale = c(-70, 15))
+                                                   y_scale = c(-81, 37))
 
 
 without_migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[-which_species_to_remove],
@@ -279,7 +281,7 @@ without_migration_ensemble_plot_all <- plot_future_pred_scale_function(data = fu
                                                                        y_name = "Biomass change (%)",
                                                                        color_lab = "",
                                                                        breaks = c(2024, 2050, 2075),
-                                                                       y_scale = c(-70, 15),
+                                                                       y_scale = c(-81, 37),
                                                                        model_facet = TRUE,
                                                                        delta = FALSE,
                                                                        color_scale = color_scale)
@@ -300,7 +302,7 @@ migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pre
                                                                y_name = "Biomass change (%)",
                                                                color_lab = "",
                                                                breaks = c(2024, 2050, 2075),
-                                                               y_scale = c(-70, 15),
+                                                               y_scale = c(-81, 37),
                                                                model_facet = TRUE,
                                                                delta = FALSE,
                                                                color_scale = color_scale)
@@ -384,7 +386,7 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
 
 sapply(1:length(migration_ensemble), function(i) {  unique(migration_ensemble[[i]][[1]]$species_name) })
 
-saved_species <- c(162, 49, 6)
+saved_species <- c(88, 44, 6)
 
 plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
   
@@ -412,17 +414,17 @@ plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
 
 }, mc.cores = 1)
 
-c_un <- magick::image_read("data/raw/image_fish/cheilinus_undulatus.jpg")
+c_me <- magick::image_read("data/raw/image_fish/caranx_melampygus.jpg")
 a_tw <- magick::image_read("data/raw/image_fish/anampses_twistii.jpg")
 a_va <- magick::image_read("data/raw/image_fish/abudefduf_vaigiensis.jpg")
 
 library(ggplot2)
 
-c_un_plot <- ggplot() + annotation_custom(grid::rasterGrob(c_un), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
+c_me_plot <- ggplot() + annotation_custom(grid::rasterGrob(c_me), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
 a_tw_plot <- ggplot() + annotation_custom(grid::rasterGrob(a_tw), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
 a_va_plot <- ggplot() + annotation_custom(grid::rasterGrob(a_va), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
 
-plot_species_patch <- patchwork::wrap_plots(((plot_species[[1]] + c_un_plot) / 
+plot_species_patch <- patchwork::wrap_plots(((plot_species[[1]] + c_me_plot) / 
                                                (plot_species[[2]] + a_tw_plot) /
                                                (plot_species[[3]] + a_va_plot)))
 

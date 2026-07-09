@@ -15,14 +15,16 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
-                       "Amblyglyphidodon curacao",  "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii",
-                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus", 
-                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
-                       "Hologymnosus annulatus", "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
-                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", "Parupeneus spilurus", 
-                       "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri", 
-                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Pterocaesio tile", "Pempheris schwenkii", 
-                       "Scarus oviceps", "Stegastes nigricans", "Thalassoma amblycephalum")
+                       "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
+                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
+                       "Chromis cyanea", "Chrysiptera rollandi", "Epinephelus daemelii", "Fistularia commersonii", 
+                       "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
+                       "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
+                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
+                       "Parupeneus spilurus", "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", 
+                       "Plectropomus maculatus", "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+                       "Pterocaesio pisang", "Pterocaesio tile", "Scarus oviceps", "Stegastes nigricans", 
+                       "Thalassoma amblycephalum")
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 

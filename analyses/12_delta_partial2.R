@@ -15,14 +15,16 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
-                       "Amblyglyphidodon curacao",  "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii",
-                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus", 
-                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", "Gnathodentex aureolineatus", "Goniistius vestitus",
-                       "Hologymnosus annulatus", "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
-                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", "Parupeneus spilurus", 
-                       "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", "Plectropomus maculatus", "Pomacentrus milleri", 
-                       "Pomacentrus reidi", "Pseudanthias huchtii", "Pterocaesio pisang", "Pterocaesio tile", "Pempheris schwenkii", 
-                       "Scarus oviceps", "Stegastes nigricans", "Thalassoma amblycephalum")
+                       "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
+                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
+                       "Chromis cyanea", "Chrysiptera rollandi", "Epinephelus daemelii", "Fistularia commersonii", 
+                       "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
+                       "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
+                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
+                       "Parupeneus spilurus", "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", 
+                       "Plectropomus maculatus", "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+                       "Pterocaesio pisang", "Pterocaesio tile", "Scarus oviceps", "Stegastes nigricans", 
+                       "Thalassoma amblycephalum")
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 
@@ -303,44 +305,44 @@ delta_species_trait2 <- delta_species_trait2 |>
   dplyr::mutate(trophic_guild2 = paste0(trophic_guild, "_", scenario))
 
 c("herbivores_SSP1-2.6",
-  "piscivore_SSP1-2.6",
   "macroinvertivore_SSP1-2.6",
+  "corallivore_SSP1-2.6",
   "planktivore_SSP1-2.6",
   "sessile invertivores_SSP1-2.6",
-  "crustacivore_SSP1-2.6",
   "microinvertivore_SSP1-2.6",
-  "corallivore_SSP1-2.6",
+  "crustacivore_SSP1-2.6",
+  "piscivore_SSP1-2.6",
   " ",
-  "piscivore_SSP5-8.5",
   "herbivores_SSP5-8.5",
   "macroinvertivore_SSP5-8.5",
-  "crustacivore_SSP5-8.5",
-  "planktivore_SSP5-8.5",
-  "sessile invertivores_SSP5-8.5",
   "corallivore_SSP5-8.5",
-  "microinvertivore_SSP5-8.5")
+  "planktivore_SSP5-8.5",
+  "piscivore_SSP5-8.5",
+  "sessile invertivores_SSP5-8.5",
+  "microinvertivore_SSP5-8.5",
+  "crustacivore_SSP5-8.5")
 
 delta_text <- data.frame(label = c("SSP1-2.6", "SSP5-8.5"),
                          x = c(4.5, 13.5),
                          y = c(160, 160))
 
 delta_species_trait2$trophic_guild2 <- factor(delta_species_trait2$trophic_guild2, levels = c("herbivores_SSP1-2.6",
-                                                                                              "piscivore_SSP1-2.6",
                                                                                               "macroinvertivore_SSP1-2.6",
+                                                                                              "corallivore_SSP1-2.6",
                                                                                               "planktivore_SSP1-2.6",
                                                                                               "sessile invertivores_SSP1-2.6",
-                                                                                              "crustacivore_SSP1-2.6",
                                                                                               "microinvertivore_SSP1-2.6",
-                                                                                              "corallivore_SSP1-2.6",
+                                                                                              "crustacivore_SSP1-2.6",
+                                                                                              "piscivore_SSP1-2.6",
                                                                                               " ",
-                                                                                              "piscivore_SSP5-8.5",
                                                                                               "herbivores_SSP5-8.5",
                                                                                               "macroinvertivore_SSP5-8.5",
-                                                                                              "crustacivore_SSP5-8.5",
-                                                                                              "planktivore_SSP5-8.5",
-                                                                                              "sessile invertivores_SSP5-8.5",
                                                                                               "corallivore_SSP5-8.5",
-                                                                                              "microinvertivore_SSP5-8.5"))
+                                                                                              "planktivore_SSP5-8.5",
+                                                                                              "piscivore_SSP5-8.5",
+                                                                                              "sessile invertivores_SSP5-8.5",
+                                                                                              "microinvertivore_SSP5-8.5",
+                                                                                              "crustacivore_SSP5-8.5"))
 
 delta_species_plot <- delta_species_trait2 |> 
   ggplot() + 
@@ -403,7 +405,7 @@ ggsave("figures/delta_trait_plot_migration.png", delta_species_plot_text, width 
 
 delta_species_bind |> 
   dplyr::inner_join(species_traits_final) |> 
-  dplyr::filter(scenario %in% c("SSP5-8.5")) |> 
+  dplyr::filter(scenario %in% c("SSP1-2.6")) |> 
   ggplot() + 
   geom_point(aes(x = forcats::fct_reorder(trophic_guild, delta), y = delta), size = 0.6, position = "jitter") +
   geom_boxplot(aes(x = forcats::fct_reorder(trophic_guild, delta), y = delta, fill = trophic_guild), alpha = 0.8, size = 0.4, outlier.shape = NA) +
