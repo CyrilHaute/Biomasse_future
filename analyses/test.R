@@ -47,47 +47,70 @@ biomass_class_future_rf_hist_withoutmigration8_hum <- lapply(1:length(biomass_cl
 })
 
 
-delta_species_full <- pbmcapply::pbmclapply(1:length(biomass_class_future_rf_hist_withoutmigration8_full), function(i) {
+biomass_class_future_xgboost_hist_withoutmigration9_full <- list.files("results/biomass_class_future_xgboost_hist_withoutmigration9_full", full.names = TRUE)
+biomass_class_future_xgboost_hist_withoutmigration9_full <- lapply(1:length(biomass_class_future_xgboost_hist_withoutmigration9_full), function(i) {
   
-  future_pred_unlog <- future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_full[i],
+  load(biomass_class_future_xgboost_hist_withoutmigration9_full[i])
+  assign(as.character(i), all_pred)
+  
+})
+biomass_class_future_xgboost_hist_withoutmigration9_env <- list.files("results/biomass_class_future_xgboost_hist_withoutmigration9_env", full.names = TRUE)
+biomass_class_future_xgboost_hist_withoutmigration9_env <- lapply(1:length(biomass_class_future_xgboost_hist_withoutmigration9_env), function(i) {
+  
+  load(biomass_class_future_xgboost_hist_withoutmigration9_env[i])
+  assign(as.character(i), all_pred)
+  
+})
+biomass_class_future_xgboost_hist_withoutmigration9_hum <- list.files("results/biomass_class_future_xgboost_hist_withoutmigration9_hum", full.names = TRUE)
+biomass_class_future_xgboost_hist_withoutmigration9_hum <- lapply(1:length(biomass_class_future_xgboost_hist_withoutmigration9_hum), function(i) {
+  
+  load(biomass_class_future_xgboost_hist_withoutmigration9_hum[i])
+  assign(as.character(i), all_pred)
+  
+})
+
+
+delta_species_full <- pbmcapply::pbmclapply(1:length(biomass_class_future_xgboost_hist_withoutmigration9_full), function(i) {
+  
+  future_pred_unlog <- future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_full[i],
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = FALSE,
                                                   biais = FALSE) |> 
     dplyr::select(delta, scenario) |> 
     unique() |> 
-    dplyr::mutate(species_name = unique(biomass_class_future_rf_hist_withoutmigration8_full[[i]][[1]]$species_name))
+    dplyr::mutate(species_name = unique(biomass_class_future_xgboost_hist_withoutmigration9_full[[i]][[1]]$species_name))
   
 }, mc.cores = parallel::detectCores() - 1)
 delta_species_full_bind <- do.call(rbind, delta_species_full) |> 
   dplyr::mutate(model = "full")
 
 
-delta_species_env <- pbmcapply::pbmclapply(1:length(biomass_class_future_rf_hist_withoutmigration8_env), function(i) {
+delta_species_env <- pbmcapply::pbmclapply(1:length(biomass_class_future_xgboost_hist_withoutmigration9_env), function(i) {
   
-  future_pred_unlog <- future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_env[i],
+  future_pred_unlog <- future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_env[i],
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = FALSE,
                                                   biais = FALSE) |> 
     dplyr::select(delta, scenario) |> 
     unique() |> 
-    dplyr::mutate(species_name = unique(biomass_class_future_rf_hist_withoutmigration8_env[[i]][[1]]$species_name))
+    dplyr::mutate(species_name = unique(biomass_class_future_xgboost_hist_withoutmigration9_env[[i]][[1]]$species_name))
   
 }, mc.cores = parallel::detectCores() - 1)
 delta_species_env_bind <- do.call(rbind, delta_species_env) |> 
   dplyr::mutate(model = "env")
 
-delta_species_hum <- pbmcapply::pbmclapply(1:length(biomass_class_future_rf_hist_withoutmigration8_hum), function(i) {
+delta_species_hum <- pbmcapply::pbmclapply(1:length(biomass_class_future_xgboost_hist_withoutmigration9_hum), function(i) {
   
-  future_pred_unlog <- future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_hum[i],
+  future_pred_unlog <- future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_hum[i],
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = FALSE,
                                                   biais = FALSE) |> 
     dplyr::select(delta, scenario) |> 
     unique() |> 
-    dplyr::mutate(species_name = unique(biomass_class_future_rf_hist_withoutmigration8_hum[[i]][[1]]$species_name))
+    dplyr::mutate(species_name = unique(biomass_class_future_xgboost_hist_withoutmigration9_hum[[i]][[1]]$species_name))
   
 }, mc.cores = parallel::detectCores() - 1)
 delta_species_hum_bind <- do.call(rbind, delta_species_hum) |> 
