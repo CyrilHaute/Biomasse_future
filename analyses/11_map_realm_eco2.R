@@ -103,7 +103,7 @@ migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
                        "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
                        "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
-                       "Chromis cyanea", "Chrysiptera rollandi", "Epinephelus daemelii", "Fistularia commersonii", 
+                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
                        "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 

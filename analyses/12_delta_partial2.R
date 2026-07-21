@@ -17,7 +17,7 @@ migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
                        "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
                        "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
-                       "Chromis cyanea", "Chrysiptera rollandi", "Epinephelus daemelii", "Fistularia commersonii", 
+                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
                        "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
@@ -164,7 +164,7 @@ var_imp <- var_imp |>
 delta_imp_var <- ggplot(var_imp) +
   geom_col(aes(x = reorder(covariates, delta_pr), y = delta_pr, fill = delta_pr)) +
   scale_fill_viridis_c(direction = -1) +
-  theme_minimal() +
+  theme_bw() +
   coord_flip() +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
@@ -183,7 +183,7 @@ var_imp_sa <- var_imp_sa |>
 delta_imp_var_sa <- ggplot(var_imp_sa) +
   geom_col(aes(x = reorder(covariates, delta_pr), y = delta_pr, fill = delta_pr)) +
   scale_fill_viridis_c(direction = -1) +
-  theme_minimal() +
+  theme_bw() +
   coord_flip() +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
@@ -242,7 +242,7 @@ partial_range_plot <- partial_delta_range_bind |>
   geom_point(aes(x = geographic_range_Albouy19, y = delta, color = scenario), size = 1) + 
   geom_line(aes(x = geographic_range_Albouy19, y = delta, color = scenario), size = 1.2, stat = "smooth", method = "gam") +
   labs(y = "", x = "Geographic range (km²)", title = "", color = "") +
-  theme_minimal() +
+  theme_bw() +
   scale_color_manual(values = color_scale) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
@@ -255,7 +255,7 @@ partial_length_plot <- partial_delta_length_bind |>
   geom_point(aes(x = Length, y = delta, color = scenario), size = 1) + 
   geom_line(aes(x = Length, y = delta, color = scenario), size = 1.2, stat = "smooth", method = "gam") +
   labs(y = "", x = "Maximum body length", title = "", color = "") +
-  theme_minimal() +
+  theme_bw() +
   scale_color_manual(values = color_scale) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
@@ -268,7 +268,7 @@ partial_n_plot <- partial_delta_n_bind |>
   geom_point(aes(x = n_future, y = delta, color = scenario), size = 1) + 
   geom_line(aes(x = n_future, y = delta, color = scenario), size = 1.2, stat = "smooth", method = "gam") +
   labs(y = "", x = "Range shift (number of new sites)", title = "B. Biomass change (%)", color = "") +
-  theme_minimal() +
+  theme_bw() +
   scale_color_manual(values = color_scale) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),

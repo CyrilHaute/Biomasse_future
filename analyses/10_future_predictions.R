@@ -27,7 +27,7 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
                        "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
                        "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
-                       "Chromis cyanea", "Chrysiptera rollandi", "Epinephelus daemelii", "Fistularia commersonii", 
+                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
                        "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
@@ -39,6 +39,11 @@ species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 
 which_species_to_remove <- which(list_species %in% species_to_remove)
+
+species_example <- c("Chaetodon kleinii", "Lutjanus carponotatus", "Plectorhinchus multivittatus")
+species_example <- stringr::str_replace_all(species_example, " ", "_")
+
+which_species_example <- which(list_species %in% species_example)
 
 
 ### Load models projection
@@ -101,8 +106,8 @@ without_migration_ensemble <- score_function(pred_biomass_data = list(biomass_cl
                                                                       biomass_class_future_xgboost_hist_withoutmigration9_full,
                                                                       biomass_class_future_dnn_hist_withoutmigration9_full),
                                              score_data = performance_bind)
-# saveRDS(migration_ensemble, "results/migration_ensemble8.rds")
-# saveRDS(without_migration_ensemble, "results/withoutmigration_ensemble8.rds")
+saveRDS(migration_ensemble, "results/migration_ensemble8.rds")
+saveRDS(without_migration_ensemble, "results/withoutmigration_ensemble8.rds")
 
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
@@ -176,7 +181,7 @@ rf_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(dat
                                            color_lab = "",
                                            breaks = c(2024, 2050, 2075),
                                            color_scale = color_scale,
-                                           delta = FALSE,
+                                           delta = TRUE,
                                            y_scale = c(-81, 37))
 rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_full[-which_species_to_remove],
                                                                                 unit = "kg",
@@ -193,7 +198,7 @@ rf_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(
                                               color_lab = "",
                                               breaks = c(2024, 2050, 2075),
                                               color_scale = color_scale,
-                                              delta = FALSE,
+                                              delta = TRUE,
                                               y_scale = c(-81, 37))
 dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_migration9_full[-which_species_to_remove],
                                                                               unit = "kg",
@@ -210,7 +215,7 @@ dnn_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(da
                                             color_lab = "",
                                             breaks = c(2024, 2050, 2075),
                                             color_scale = color_scale,
-                                            delta = FALSE,
+                                            delta = TRUE,
                                             y_scale = c(-81, 37))
 dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_dnn_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                  unit = "kg",
@@ -227,7 +232,7 @@ dnn_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function
                                                color_lab = "",
                                                breaks = c(2024, 2050, 2075),
                                                color_scale = color_scale,
-                                               delta = FALSE,
+                                               delta = TRUE,
                                                y_scale = c(-81, 37))
 xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_migration9_full[-which_species_to_remove],
                                                                                   unit = "kg",
@@ -244,7 +249,7 @@ xgboost_plot <- plot_future_pred_scale_function(data = future_pred_scale_functio
                                                 color_lab = "",
                                                 breaks = c(2024, 2050, 2075),
                                                 color_scale = color_scale,
-                                                delta = FALSE,
+                                                delta = TRUE,
                                                 y_scale = c(-81, 37))
 xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_xgboost_hist_withoutmigration9_full[-which_species_to_remove],
                                                                                      unit = "kg",
@@ -261,7 +266,7 @@ xgboost_plot_wm <- plot_future_pred_scale_function(data = future_pred_scale_func
                                                    color_lab = "",
                                                    breaks = c(2024, 2050, 2075),
                                                    color_scale = color_scale,
-                                                   delta = FALSE,
+                                                   delta = TRUE,
                                                    y_scale = c(-81, 37))
 
 
@@ -350,6 +355,39 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
 }, mc.cores = parallel::detectCores() - 1))
 
 
+species_removed_example_plot <- pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_example]), function(i) {
+  
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[which_species_example][i],
+                                                                                         unit = "kg",
+                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         score = TRUE,
+                                                                                         biais = TRUE,
+                                                                                         mc.cores = 1) |>
+                                                         dplyr::group_by(scenario) |>
+                                                         dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
+                                                                       upper = (1 - (upper / dplyr::first(biomass))) * - 100,
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+                                                         dplyr::ungroup(),
+                                                       group_name = unique(migration_ensemble[which_species_example][[i]][[1]]$species_name),
+                                                       title = unique(migration_ensemble[which_species_example][[i]][[1]]$species_name),
+                                                       x_name = "",
+                                                       y_name = "Biomass (kg)",
+                                                       color_lab = "",
+                                                       model_facet = FALSE,
+                                                       face = "italic",
+                                                       breaks = c(2024, 2050, 2100),
+                                                       color_scale = color_scale,
+                                                       delta = FALSE)
+
+}, mc.cores = parallel::detectCores() - 1)
+species_removed_example_plot_bind <- patchwork::wrap_plots(species_removed_example_plot) +
+  patchwork::plot_layout(guides = "collect") &
+  ggplot2::theme(legend.position = "bottom",
+                 legend.direction = "horizontal")
+ggplot2::ggsave(species_removed_example_plot_bind, filename = "figures/species_removed_example_plot_bind.png", width = 11)
+
+
+
 
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
 
@@ -380,6 +418,7 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
   ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[[i]][[1]]$species_name), ".png"))
 
 }, mc.cores = parallel::detectCores() - 1))
+
 
 
 #### Extract projection for Cheilinus undulatus, Anampses twistii and Abudefduf vaigiensis

@@ -17,7 +17,7 @@ migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
                        "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
                        "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
-                       "Chromis cyanea", "Chrysiptera rollandi", "Epinephelus daemelii", "Fistularia commersonii", 
+                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
                        "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
@@ -62,6 +62,13 @@ delta_species_trait <- delta_species_bind |>
 
 length(unique(delta_species_trait$species_name))
 
+species_traits_final |>
+  dplyr::filter(species_name %in% unique(delta_species_bind$species_name)) |> 
+  dplyr::select(species_name) |> 
+  unique() |> 
+  unlist() |> 
+  length()
+
 baseline_uicn <- species_traits_final |>
   dplyr::filter(species_name %in% unique(delta_species_bind$species_name)
                 # ,
@@ -82,6 +89,14 @@ baseline_uicn <- baseline_uicn |>
 
 delta_species_trait$scenario <- as.character(delta_species_trait$scenario)
 
+delta_species_trait |>
+  dplyr::filter(species_name %in% unique(delta_species_bind$species_name),
+                IUCN_category %in% c("LC", "NT", "DD")) |> 
+  dplyr::select(species_name) |> 
+  unique() |> 
+  unlist() |> 
+  length()
+
 delta_species_trait_new <- delta_species_trait |> 
   dplyr::filter(IUCN_category %in% c("LC", "NT", "DD")) |> 
   dplyr::mutate(
@@ -94,13 +109,27 @@ delta_species_trait_new <- delta_species_trait |>
       delta <= -30 ~ "VU")) |> 
   dplyr::group_by(scenario, IUCN) |> 
   dplyr::summarise(freq = dplyr::n()) |> 
-  dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+  dplyr::mutate(step = "1")
+
+test <- delta_species_trait |> 
+  dplyr::filter(!IUCN_category %in% c("LC", "NT", "DD")) |> 
+  dplyr::mutate(IUCN = IUCN_category) |> 
+  dplyr::group_by(scenario, IUCN) |> 
+  dplyr::summarise(freq = dplyr::n()) |> 
   dplyr::ungroup() |> 
-  dplyr::full_join(baseline_uicn) |> 
-  dplyr::group_by(IUCN) |> 
+  dplyr::mutate(step = "2")
+
+test2 <- delta_species_trait_new |> 
+  dplyr::full_join(test) |>
+  dplyr::group_by(scenario, IUCN) |> 
+  dplyr::summarise(freq = sum(freq)) |> 
+  dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+  dplyr::ungroup() |>
+  dplyr::full_join(baseline_uicn) |>
+  dplyr::group_by(IUCN) |>
   dplyr::mutate(alluvium = dplyr::cur_group_id())
 
-delta_species_trait_new <- delta_species_trait_new |> 
+delta_species_trait_new <- test2 |> 
   dplyr::mutate(stratum = dplyr::case_when(stratum < 1 ~ NA,
                                            stratum >= 1 ~ stratum))
 
@@ -177,7 +206,7 @@ baseline_uicn$freq <- as.integer(baseline_uicn$freq)
 
 baseline_uicn <- baseline_uicn |>
   dplyr::mutate(scenario = "Baseline",
-                stratum = round((freq * 100) / sum(freq), 1))
+                stratum = round((freq * 100) / sum(freq)))
 
 delta_species_trait$scenario <- as.character(delta_species_trait$scenario)
 
@@ -193,11 +222,27 @@ delta_species_trait_new <- delta_species_trait |>
       delta <= -30 ~ "VU")) |> 
   dplyr::group_by(scenario, IUCN) |> 
   dplyr::summarise(freq = dplyr::n()) |> 
-  dplyr::mutate(stratum = round((freq * 100) / sum(freq), 1)) |> 
+  dplyr::mutate(step = "1")
+
+test <- delta_species_trait |> 
+  dplyr::filter(!IUCN_category %in% c("LC", "NT", "DD")) |> 
+  dplyr::mutate(IUCN = IUCN_category) |> 
+  dplyr::group_by(scenario, IUCN) |> 
+  dplyr::summarise(freq = dplyr::n()) |> 
   dplyr::ungroup() |> 
-  dplyr::full_join(baseline_uicn) |> 
-  dplyr::group_by(IUCN) |> 
+  dplyr::mutate(step = "2")
+
+test2 <- delta_species_trait_new |> 
+  dplyr::full_join(test) |>
+  dplyr::group_by(scenario, IUCN) |> 
+  dplyr::summarise(freq = sum(freq)) |> 
+  dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+  dplyr::ungroup() |>
+  dplyr::full_join(baseline_uicn) |>
+  dplyr::group_by(IUCN) |>
   dplyr::mutate(alluvium = dplyr::cur_group_id())
+
+delta_species_trait_new <- test2 
 
 library(ggplot2)
 library(ggalluvial)
@@ -230,12 +275,26 @@ ggsave(iucn_alluvial_without_migration, file = "figures/iucn_alluvial_hist_witho
 
 
 
-mean_species <- performance_bind |> 
+mean_species <- performance_bind_save |> 
   dplyr::group_by(species_name) |> 
-  dplyr::summarise(mean_r2 = mean(r2))
+  dplyr::summarise(mean_r2 = mean(r2)) |> 
+  dplyr::filter(!species_name %in% stringr::str_replace_all(species_to_remove, "_", " "))
 
 perf_test_0.75 <- mean_species |> 
-  dplyr::filter(mean_r2 > quantile(mean_r2, probs = 0.75))
+  dplyr::filter(mean_r2 > quantile(mean_r2, probs = 0.5))
+
+species_traits_final |>
+  dplyr::filter(species_name %in% perf_test_0.75$species_name) |> 
+  dplyr::filter(IUCN_category == "DD") |> 
+  dplyr::select(species_name) |> 
+  unique()
+
+species_traits_final |>
+  dplyr::filter(species_name %in% perf_test_0.75$species_name) |> 
+  dplyr::select(species_name) |> 
+  unique() |> 
+  unlist() |> 
+  length()
 
 baseline_uicn_0.75 <- species_traits_final |>
   dplyr::filter(species_name %in% perf_test_0.75$species_name
@@ -253,7 +312,39 @@ baseline_uicn_0.75$freq <- as.integer(baseline_uicn_0.75$freq)
 
 baseline_uicn_0.75 <- baseline_uicn_0.75 |>
   dplyr::mutate(scenario = "Baseline",
-                stratum = round((freq * 100) / sum(freq), 1))
+                stratum = round((freq * 100) / sum(freq)))
+
+delta_species_trait |> 
+  dplyr::filter(species_name %in% perf_test_0.75$species_name,
+                IUCN_category == "DD") |> 
+  dplyr::select(species_name) |> 
+  unique()
+
+delta_species_trait |>
+  dplyr::filter(species_name %in% perf_test_0.75$species_name) |> 
+  dplyr::select(species_name) |> 
+  unique() |> 
+  unlist() |> 
+  length()
+
+# delta_species_trait_new_0.75 <- delta_species_trait |> 
+#   dplyr::filter(species_name %in% perf_test_0.75$species_name,
+#                 IUCN_category %in% c("LC", "NT", "DD")) |> 
+#   dplyr::mutate(
+#     IUCN = dplyr::case_when(
+#       IUCN_category %in% c("DD") ~ "DD",
+#       delta > 0 ~ "LC",
+#       delta > -30 ~ "NT",
+#       delta <= -80 ~ "CR",
+#       delta <= -50 ~ "EN",
+#       delta <= -30 ~ "VU")) |> 
+#   dplyr::group_by(scenario, IUCN) |> 
+#   dplyr::summarise(freq = dplyr::n()) |> 
+#   dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+#   dplyr::ungroup() |> 
+#   dplyr::full_join(baseline_uicn_0.75) |> 
+#   dplyr::group_by(IUCN) |> 
+#   dplyr::mutate(alluvium = dplyr::cur_group_id())
 
 delta_species_trait_new_0.75 <- delta_species_trait |> 
   dplyr::filter(species_name %in% perf_test_0.75$species_name,
@@ -267,16 +358,39 @@ delta_species_trait_new_0.75 <- delta_species_trait |>
       delta <= -50 ~ "EN",
       delta <= -30 ~ "VU")) |> 
   dplyr::group_by(scenario, IUCN) |> 
-  dplyr::summarise(freq = dplyr::n()) |> 
-  dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+  dplyr::summarise(freq = dplyr::n()) |>
   dplyr::ungroup() |> 
-  dplyr::full_join(baseline_uicn_0.75) |> 
-  dplyr::group_by(IUCN) |> 
+  dplyr::mutate(step = "1")
+
+test <- delta_species_trait |> 
+  dplyr::filter(species_name %in% perf_test_0.75$species_name,
+                !IUCN_category %in% c("LC", "NT", "DD")) |> 
+  dplyr::mutate(IUCN = IUCN_category) |> 
+  dplyr::group_by(scenario, IUCN) |> 
+  dplyr::summarise(freq = dplyr::n()) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(step = "2")
+
+test2 <- delta_species_trait_new_0.75 |> 
+  dplyr::full_join(test) |>
+  dplyr::group_by(scenario, IUCN) |> 
+  dplyr::summarise(freq = sum(freq)) |> 
+  dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+  dplyr::ungroup() |>
+  dplyr::full_join(baseline_uicn_0.75) |>
+  dplyr::group_by(IUCN) |>
   dplyr::mutate(alluvium = dplyr::cur_group_id())
 
-delta_species_trait_new_0.75 <- delta_species_trait_new_0.75 |> 
+delta_species_trait_new_0.75 <- test2 |> 
   dplyr::mutate(stratum = dplyr::case_when(stratum < 1 ~ NA,
                                            stratum >= 1 ~ stratum))
+
+# delta_species_trait_new_0.75 <- delta_species_trait_new_0.75 |> 
+#   dplyr::mutate(stratum = dplyr::case_when(stratum < 1 ~ NA,
+#                                            stratum >= 1 ~ stratum))
+
+sum(delta_species_trait_new_0.75[delta_species_trait_new_0.75$scenario == "SSP1-2.6",]$freq)
+sum(delta_species_trait_new_0.75[delta_species_trait_new_0.75$scenario == "Baseline",]$freq)
 
 library(ggplot2)
 library(ggalluvial)
@@ -300,4 +414,4 @@ iucn_alluvial_0.75 <- delta_species_trait_new_0.75 |>
   theme_bw() +
   labs(x = "", y = "Number of species", fill = "")
 
-ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width = 7.5, height = 7)
+ggsave(iucn_alluvial_0.75, file = "figures/iucn_alluvial_hist_0.75.png", width = 7.5, height = 7)
