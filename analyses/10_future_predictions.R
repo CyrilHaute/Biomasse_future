@@ -387,6 +387,62 @@ species_removed_example_plot_bind <- patchwork::wrap_plots(species_removed_examp
 ggplot2::ggsave(species_removed_example_plot_bind, filename = "figures/species_removed_example_plot_bind.png", width = 11)
 
 
+new_dir <- "figures/species_specific_removed_migration/"
+dir.create(new_dir)
+unlist(pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_to_remove]), function(i) {
+  
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[which_species_to_remove][i],
+                                                                                         unit = "kg",
+                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         score = TRUE,
+                                                                                         biais = TRUE,
+                                                                                         mc.cores = 1) |>
+                                                         dplyr::group_by(scenario) |>
+                                                         dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
+                                                                       upper = (1 - (upper / dplyr::first(biomass))) * - 100,
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+                                                         dplyr::ungroup(),
+                                                       group_name = unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       title = unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       x_name = "",
+                                                       y_name = "Biomass (kg)",
+                                                       color_lab = "",
+                                                       model_facet = FALSE,
+                                                       face = "italic",
+                                                       breaks = c(2024, 2050, 2100),
+                                                       color_scale = color_scale)
+  
+  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name), ".png"))
+  
+}, mc.cores = parallel::detectCores() - 1))
+new_dir <- "figures/species_specific_removed_without_migration/"
+dir.create(new_dir)
+unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble[which_species_to_remove]), function(i) {
+  
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[which_species_to_remove][i],
+                                                                                         unit = "kg",
+                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         score = TRUE,
+                                                                                         biais = TRUE,
+                                                                                         mc.cores = 1) |>
+                                                         dplyr::group_by(scenario) |>
+                                                         dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
+                                                                       upper = (1 - (upper / dplyr::first(biomass))) * - 100,
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+                                                         dplyr::ungroup(),
+                                                       group_name = unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       title = unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       x_name = "",
+                                                       y_name = "Biomass (kg)",
+                                                       color_lab = "",
+                                                       model_facet = FALSE,
+                                                       face = "italic",
+                                                       breaks = c(2024, 2050, 2100),
+                                                       color_scale = color_scale)
+  
+  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name), ".png"))
+  
+}, mc.cores = parallel::detectCores() - 1))
 
 
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
