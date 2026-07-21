@@ -2583,3 +2583,59 @@ sdm_future_function5 <- function(biomass,
 #   
 # }
 
+fix_cov_function <- function(data,
+                             which_var_to_fix) {
+  
+  year <- 2024:2100
+  
+  if(which_var_to_fix == "hum") {
+    
+    env_future_env <- pbmcapply::pbmclapply(1:length(year), function(i) {
+      
+      year_i <- year[i]
+      year_i <- data |> 
+        dplyr::filter(year == year_i)
+      
+      baseline <- data |> 
+        dplyr::filter(year == 2024)
+      
+      hum_i <-  baseline[colnames(baseline) %in% c("survey_id", "longitude", "latitude", colnames(baseline)[which(grepl(pattern = paste0(c("gdp", "gravity"), collapse = "|"), x = colnames(baseline)) == TRUE)])]
+      
+      env_i <- year_i[!colnames(year_i) %in% colnames(year_i)[which(grepl(pattern = paste0(c("gdp", "gravity"), collapse = "|"), x = colnames(year_i)) == TRUE)]]
+      
+      new_year_i <- env_i |>
+        dplyr::inner_join(hum_i)
+      
+    }, mc.cores = 1)
+    env_future_env_bind <- do.call(rbind, env_future_env)
+    
+    return(env_future_env_bind)
+    
+  }
+  
+  if(which_var_to_fix == "env") {
+    
+    env_future_hum <- pbmcapply::pbmclapply(1:length(year), function(i) {
+      
+      year_i <- year[i]
+      year_i <- data |> 
+        dplyr::filter(year == year_i)
+      
+      baseline <- data |> 
+        dplyr::filter(year == 2024)
+      
+      env_i <-  baseline[colnames(baseline) %in% c("survey_id", "longitude", "latitude", colnames(baseline)[which(grepl(pattern = paste0(c("chl", "ph", "sss", "sst"), collapse = "|"), x = colnames(baseline)) == TRUE)])]
+      
+      hum_i <- year_i[!colnames(year_i) %in% colnames(year_i)[which(grepl(pattern = paste0(c("chl", "ph", "sss", "sst"), collapse = "|"), x = colnames(year_i)) == TRUE)]]
+      
+      new_year_i <- hum_i |>
+        dplyr::inner_join(env_i)
+      
+    }, mc.cores = 1)
+    env_future_hum_bind <- do.call(rbind, env_future_hum)
+    
+    return(env_future_hum_bind)
+    
+  }
+  
+}

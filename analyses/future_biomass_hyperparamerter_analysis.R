@@ -14,10 +14,38 @@ scenarii <- c("ssp126", "ssp245", "ssp370", "ssp585")
 color_scale <- palette.colors()
 color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], color_scale[7]))
 
-load("results/biomass_class_future_rf_hist_withoutmigration8_mns_1_full.Rdata") # min.node.size = 1
-load("results/biomass_class_future_rf_hist_withoutmigration8_mns_5_full.Rdata") # min.node.size = 5
-load("results/biomass_class_future_rf_hist_withoutmigration8_mns_25_full.Rdata") # min.node.size = 25
-load("results/biomass_class_future_rf_hist_withoutmigration8_full.Rdata") # min.node.size = 50
+# min.node.size = 1
+biomass_class_future_rf_hist_withoutmigration8_mns_1_full <- list.files("results/biomass_class_future_rf_hist_withoutmigration8_mns_1_full", full.names = TRUE)
+biomass_class_future_rf_hist_withoutmigration8_mns_1_full <- lapply(1:length(biomass_class_future_rf_hist_withoutmigration8_mns_1_full), function(i) {
+  
+  load(biomass_class_future_rf_hist_withoutmigration8_mns_1_full[i])
+  assign(as.character(i), all_pred)
+  
+})
+# min.node.size = 5
+biomass_class_future_rf_hist_withoutmigration8_mns_5_full <- list.files("results/biomass_class_future_rf_hist_withoutmigration8_mns_5_full", full.names = TRUE)
+biomass_class_future_rf_hist_withoutmigration8_mns_5_full <- lapply(1:length(biomass_class_future_rf_hist_withoutmigration8_mns_5_full), function(i) {
+  
+  load(biomass_class_future_rf_hist_withoutmigration8_mns_5_full[i])
+  assign(as.character(i), all_pred)
+  
+})
+# min.node.size = 25
+biomass_class_future_rf_hist_withoutmigration8_mns_25_full <- list.files("results/biomass_class_future_rf_hist_withoutmigration8_mns_25_full", full.names = TRUE)
+biomass_class_future_rf_hist_withoutmigration8_mns_25_full <- lapply(1:length(biomass_class_future_rf_hist_withoutmigration8_mns_25_full), function(i) {
+  
+  load(biomass_class_future_rf_hist_withoutmigration8_mns_25_full[i])
+  assign(as.character(i), all_pred)
+  
+})
+# min.node.size = 50
+biomass_class_future_rf_hist_withoutmigration8_mns_50_full <- list.files("results/biomass_class_future_rf_hist_withoutmigration8_full", full.names = TRUE)
+biomass_class_future_rf_hist_withoutmigration8_mns_50_full <- lapply(1:length(biomass_class_future_rf_hist_withoutmigration8_mns_50_full), function(i) {
+  
+  load(biomass_class_future_rf_hist_withoutmigration8_mns_50_full[i])
+  assign(as.character(i), all_pred)
+  
+})
 
 
 rf_plot_wm_1 <- future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_mns_1_full,
@@ -53,7 +81,7 @@ rf_plot_wm_25 <- future_pred_scale_function(data = biomass_class_future_rf_hist_
   dplyr::ungroup() |> 
   dplyr::mutate(model = "min.node.size = 25")
 
-rf_plot_wm_50 <- future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_full,
+rf_plot_wm_50 <- future_pred_scale_function(data = biomass_class_future_rf_hist_withoutmigration8_mns_50_full,
                                             unit = "kg",
                                             time = as.character(c("2024":"2075")),
                                             biais = FALSE) |> 

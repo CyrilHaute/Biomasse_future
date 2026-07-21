@@ -220,6 +220,10 @@ performance_bind_save <- performance_bind_rf |>
   dplyr::full_join(performance_bind_xgboost) |> 
   dplyr::full_join(performance_bind_dnn)
 
+performance_bind_save |> 
+  dplyr::select(model, medianpearson, q05pearson, q95pearson) |> 
+  unique()
+
 save(performance_bind_save, file = "results/performance_bind.Rdata")
 
 
