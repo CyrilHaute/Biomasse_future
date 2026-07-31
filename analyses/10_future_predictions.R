@@ -148,7 +148,7 @@ migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_sc
                                                                            biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |> 
                                                              dplyr::ungroup() |> 
                                                              dplyr::mutate(model = "With range shift"),
-                                                           title = "",
+                                                           title = "B.",
                                                            x_name = "",
                                                            y_name = "Biomass change (%)",
                                                            color_lab = "",
@@ -387,6 +387,62 @@ species_removed_example_plot_bind <- patchwork::wrap_plots(species_removed_examp
 ggplot2::ggsave(species_removed_example_plot_bind, filename = "figures/species_removed_example_plot_bind.png", width = 11)
 
 
+new_dir <- "figures/species_specific_removed_migration/"
+dir.create(new_dir)
+unlist(pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_to_remove]), function(i) {
+  
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[which_species_to_remove][i],
+                                                                                         unit = "kg",
+                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         score = TRUE,
+                                                                                         biais = TRUE,
+                                                                                         mc.cores = 1) |>
+                                                         dplyr::group_by(scenario) |>
+                                                         dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
+                                                                       upper = (1 - (upper / dplyr::first(biomass))) * - 100,
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+                                                         dplyr::ungroup(),
+                                                       group_name = unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       title = unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       x_name = "",
+                                                       y_name = "Biomass (kg)",
+                                                       color_lab = "",
+                                                       model_facet = FALSE,
+                                                       face = "italic",
+                                                       breaks = c(2024, 2050, 2100),
+                                                       color_scale = color_scale)
+  
+  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name), ".png"))
+  
+}, mc.cores = parallel::detectCores() - 1))
+new_dir <- "figures/species_specific_removed_without_migration/"
+dir.create(new_dir)
+unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble[which_species_to_remove]), function(i) {
+  
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[which_species_to_remove][i],
+                                                                                         unit = "kg",
+                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         score = TRUE,
+                                                                                         biais = TRUE,
+                                                                                         mc.cores = 1) |>
+                                                         dplyr::group_by(scenario) |>
+                                                         dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
+                                                                       upper = (1 - (upper / dplyr::first(biomass))) * - 100,
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+                                                         dplyr::ungroup(),
+                                                       group_name = unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       title = unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       x_name = "",
+                                                       y_name = "Biomass (kg)",
+                                                       color_lab = "",
+                                                       model_facet = FALSE,
+                                                       face = "italic",
+                                                       breaks = c(2024, 2050, 2100),
+                                                       color_scale = color_scale)
+  
+  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name), ".png"))
+  
+}, mc.cores = parallel::detectCores() - 1))
 
 
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
@@ -394,7 +450,7 @@ without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
 new_dir <- "figures/species_specific_without_migration8/"
 dir.create(new_dir)
 unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
-
+  
   future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[i],
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
@@ -414,9 +470,9 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
                                                        face = "italic",
                                                        breaks = c(2024, 2050, 2100),
                                                        color_scale = color_scale)
-
+  
   ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[[i]][[1]]$species_name), ".png"))
-
+  
 }, mc.cores = parallel::detectCores() - 1))
 
 
@@ -434,11 +490,11 @@ plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
                                                                                          time = as.character(c("2024":"2075")),
                                                                                          score = TRUE,
                                                                                          biais = TRUE,
-                                                                                         mc.cores = parallel::detectCores() - 1) |> 
-                                                         dplyr::group_by(scenario) |> 
+                                                                                         mc.cores = parallel::detectCores() - 1) |>
+                                                         dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * -100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * -100,
-                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * -100) |> 
+                                                                       biomass = (1 - (biomass / dplyr::first(biomass))) * -100) |>
                                                          dplyr::ungroup(),
                                                        ncol = 3,
                                                        group_name = unique(migration_ensemble[[saved_species[i]]][[1]]$species_name),
@@ -450,7 +506,7 @@ plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
                                                        face = "italic",
                                                        model_facet = FALSE,
                                                        color_scale = color_scale)
-
+  
 }, mc.cores = 1)
 
 c_me <- magick::image_read("data/raw/image_fish/caranx_melampygus.jpg")
@@ -463,7 +519,7 @@ c_me_plot <- ggplot() + annotation_custom(grid::rasterGrob(c_me), xmin = -Inf, x
 a_tw_plot <- ggplot() + annotation_custom(grid::rasterGrob(a_tw), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
 a_va_plot <- ggplot() + annotation_custom(grid::rasterGrob(a_va), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
 
-plot_species_patch <- patchwork::wrap_plots(((plot_species[[1]] + c_me_plot) / 
+plot_species_patch <- patchwork::wrap_plots(((plot_species[[1]] + c_me_plot) /
                                                (plot_species[[2]] + a_tw_plot) /
                                                (plot_species[[3]] + a_va_plot)))
 
@@ -479,10 +535,10 @@ delta_realm_migration <- future_pred_scale_function(data = migration_ensemble[-w
                                                     score = TRUE,
                                                     biais = TRUE,
                                                     mc.cores = parallel::detectCores() - 1)
-delta_realm_s_migration <- delta_realm_migration |> 
-  dplyr::ungroup() |> 
-  dplyr::select(scale, delta, scenario) |> 
-  unique() |> 
+delta_realm_s_migration <- delta_realm_migration |>
+  dplyr::ungroup() |>
+  dplyr::select(scale, delta, scenario) |>
+  unique() |>
   dplyr::group_split(scenario)
 
 delta_realm_without_migration <- future_pred_scale_function(data = without_migration_ensemble[-c(375, 380)],
@@ -491,10 +547,10 @@ delta_realm_without_migration <- future_pred_scale_function(data = without_migra
                                                             scale = "realm",
                                                             to_remove = 0,
                                                             score = TRUE)
-delta_realm_s_without_migration <- delta_realm_without_migration |> 
-  dplyr::ungroup() |> 
-  dplyr::select(scale, delta, scenario) |> 
-  unique() |> 
+delta_realm_s_without_migration <- delta_realm_without_migration |>
+  dplyr::ungroup() |>
+  dplyr::select(scale, delta, scenario) |>
+  unique() |>
   dplyr::group_split(scenario)
 
 
@@ -521,23 +577,23 @@ model_hum <- future_pred_scale_function(data = ensemble_model_hum_hist,
                                         score = TRUE)
 model_hum$model_scenario <- "hum"
 
-model_total <- model_full |> 
-  dplyr::group_by(scenario, model_scenario) |> 
+model_total <- model_full |>
+  dplyr::group_by(scenario, model_scenario) |>
   dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                 upper = (1 - (upper / dplyr::first(biomass))) * - 100,
-                biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |> 
-  dplyr::ungroup() |> 
-  dplyr::full_join(model_env |> 
-                     dplyr::group_by(scenario, model_scenario) |> 
+                biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+  dplyr::ungroup() |>
+  dplyr::full_join(model_env |>
+                     dplyr::group_by(scenario, model_scenario) |>
                      dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                    upper = (1 - (upper / dplyr::first(biomass))) * - 100,
-                                   biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |> 
-                     dplyr::ungroup()) |> 
-  dplyr::full_join(model_hum |> 
-                     dplyr::group_by(scenario, model_scenario) |> 
+                                   biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
+                     dplyr::ungroup()) |>
+  dplyr::full_join(model_hum |>
+                     dplyr::group_by(scenario, model_scenario) |>
                      dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                    upper = (1 - (upper / dplyr::first(biomass))) * - 100,
-                                   biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |> 
+                                   biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
                      dplyr::ungroup())
 
 model_plot_scenario <- plot_future_pred_scale_function(data = model_total,
@@ -557,13 +613,13 @@ delta_species_full <- pbmcapply::pbmclapply(1:length(ensemble_model_hist), funct
   future_pred_unlog <- future_pred_scale_function(data = ensemble_model_hist[i],
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
-                                                  score = TRUE) |> 
-    dplyr::select(delta, scenario) |> 
-    unique() |> 
+                                                  score = TRUE) |>
+    dplyr::select(delta, scenario) |>
+    unique() |>
     dplyr::mutate(species_name = unique(ensemble_model_hist[[i]][[1]]$species_name))
   
 }, mc.cores = parallel::detectCores() - 1)
-delta_species_full_bind <- do.call(rbind, delta_species_full) |> 
+delta_species_full_bind <- do.call(rbind, delta_species_full) |>
   dplyr::mutate(model = "full")
 
 
@@ -572,13 +628,13 @@ delta_species_env <- pbmcapply::pbmclapply(1:length(ensemble_model_env_hist), fu
   future_pred_unlog <- future_pred_scale_function(data = ensemble_model_env_hist[i],
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
-                                                  score = TRUE) |> 
-    dplyr::select(delta, scenario) |> 
-    unique() |> 
+                                                  score = TRUE) |>
+    dplyr::select(delta, scenario) |>
+    unique() |>
     dplyr::mutate(species_name = unique(ensemble_model_env_hist[[i]][[1]]$species_name))
   
 }, mc.cores = parallel::detectCores() - 1)
-delta_species_env_bind <- do.call(rbind, delta_species_env) |> 
+delta_species_env_bind <- do.call(rbind, delta_species_env) |>
   dplyr::mutate(model = "env")
 
 delta_species_hum <- pbmcapply::pbmclapply(1:length(ensemble_model_hum_hist), function(i) {
@@ -586,26 +642,26 @@ delta_species_hum <- pbmcapply::pbmclapply(1:length(ensemble_model_hum_hist), fu
   future_pred_unlog <- future_pred_scale_function(data = ensemble_model_hum_hist[i],
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
-                                                  score = TRUE) |> 
-    dplyr::select(delta, scenario) |> 
-    unique() |> 
+                                                  score = TRUE) |>
+    dplyr::select(delta, scenario) |>
+    unique() |>
     dplyr::mutate(species_name = unique(ensemble_model_hum_hist[[i]][[1]]$species_name))
   
 }, mc.cores = parallel::detectCores() - 1)
-delta_species_hum_bind <- do.call(rbind, delta_species_hum) |> 
+delta_species_hum_bind <- do.call(rbind, delta_species_hum) |>
   dplyr::mutate(model = "hum")
 
-delta_species_all <- delta_species_full_bind |> 
+delta_species_all <- delta_species_full_bind |>
   dplyr::full_join(delta_species_env_bind) |>
   dplyr::full_join(delta_species_hum_bind)
 
-summary_delta <- delta_species_all |> 
-  dplyr::group_by(model, scenario) |> 
+summary_delta <- delta_species_all |>
+  dplyr::group_by(model, scenario) |>
   dplyr::summarise(mean_delta = mean(delta),
                    max_delta = max(delta),
                    min_delta = min(delta),
                    sd_delta = sd(delta))
-  
+
 
 delta_plot_model <- delta_plot_function_model(delta_species_all = delta_species_all) +
   scale_y_continuous(limits = c(-100, 100))

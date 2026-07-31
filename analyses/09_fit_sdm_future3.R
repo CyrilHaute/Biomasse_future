@@ -162,11 +162,3 @@ unlist(pbmcapply::pbmclapply(1:length(species_biomass), function(i) {
   
 }, mc.cores = parallel::detectCores() - 1))
 
-biomass_class_future_dnn_hist_withoutmigration9_full <- list.files("results/biomass_class_future_dnn_hist_withoutmigration9_full", full.names = TRUE)
-biomass_class_future_dnn_hist_withoutmigration9_full <- lapply(1:length(biomass_class_future_dnn_hist_withoutmigration9_full), function(i) {
-
-  load(biomass_class_future_dnn_hist_withoutmigration9_full[i])
-  assign(as.character(i), all_pred)
-
-})
-save(biomass_class_future_dnn_hist_withoutmigration9_full, file = "results/biomass_class_future_dnn_hist_withoutmigration9_full.Rdata")

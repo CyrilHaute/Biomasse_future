@@ -48,7 +48,12 @@ delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i)
 delta_species_bind <- do.call(rbind, delta_species) |> 
   dplyr::mutate(model = "full")
 
-delta_plot <- delta_plot_function(delta_species_bind = delta_species_bind)
+max(delta_species_bind$delta)
+
+delta_plot <- delta_plot_function(delta_species_bind = delta_species_bind,
+                                  stab_y = c(310, 400, 355)) +
+  labs(title = "A. With range shift") +
+  scale_y_continuous(limits = c(-100, round(max(delta_species_bind$delta))))
 ggsave("figures/delta_plot_plot_hist_migration.png", delta_plot, width = 9, height = 5)
 
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
@@ -69,8 +74,14 @@ delta_species_without <- pbmcapply::pbmclapply(1:length(without_migration_ensemb
 delta_species_without_bind <- do.call(rbind, delta_species_without) |>
   dplyr::mutate(model = "full")
 
-delta_plot_without <- delta_plot_function(delta_species_bind = delta_species_without_bind)
-ggsave("figures/delta_plot_plot_hist_without_migration.png", delta_plot_without, width = 9, height = 5)
+delta_plot_without <- delta_plot_function(delta_species_bind = delta_species_without_bind,
+                                          stab_y = c(85, 125, 105)) +
+  labs(title = "B. Without range shift")
+delta_plot_with_without <- patchwork::wrap_plots(delta_plot / delta_plot_without) +
+  patchwork::plot_layout(guides = "collect") &
+  theme(legend.position = "bottom",
+        legend.direction = "horizontal")
+ggsave("figures/delta_plot_plot_hist_with_without_migration.png", delta_plot_with_without, width = 9, height = 10)
 
 
 load("data/raw/1c_species_traits_final.Rdata")
@@ -241,7 +252,7 @@ partial_range_plot <- partial_delta_range_bind |>
   ggplot() +
   geom_point(aes(x = geographic_range_Albouy19, y = delta, color = scenario), size = 1) + 
   geom_line(aes(x = geographic_range_Albouy19, y = delta, color = scenario), size = 1.2, stat = "smooth", method = "gam") +
-  labs(y = "", x = "Geographic range (km²)", title = "", color = "") +
+  labs(y = "", x = "Geographic range (km²)", title = "C.", color = "") +
   theme_bw() +
   scale_color_manual(values = color_scale) +
   theme(axis.text.x = element_text(size = 12),
@@ -254,7 +265,7 @@ partial_length_plot <- partial_delta_length_bind |>
   ggplot() +
   geom_point(aes(x = Length, y = delta, color = scenario), size = 1) + 
   geom_line(aes(x = Length, y = delta, color = scenario), size = 1.2, stat = "smooth", method = "gam") +
-  labs(y = "", x = "Maximum body length", title = "", color = "") +
+  labs(y = "", x = "Maximum body length", title = "D.", color = "") +
   theme_bw() +
   scale_color_manual(values = color_scale) +
   theme(axis.text.x = element_text(size = 12),
@@ -267,14 +278,15 @@ partial_n_plot <- partial_delta_n_bind |>
   ggplot() +
   geom_point(aes(x = n_future, y = delta, color = scenario), size = 1) + 
   geom_line(aes(x = n_future, y = delta, color = scenario), size = 1.2, stat = "smooth", method = "gam") +
-  labs(y = "", x = "Range shift (number of new sites)", title = "B. Biomass change (%)", color = "") +
+  labs(y = "Biomass change (%)", x = "Range shift (number of new sites)", title = "B.", color = "") +
   theme_bw() +
   scale_color_manual(values = color_scale) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
         axis.title = element_text(size = 14),
         strip.text.x = element_text(size = 12),
-        strip.text.y = element_text(size = 12))
+        strip.text.y = element_text(size = 12),
+        axis.title.y = element_text(vjust = -40))
 
 partial_plot <- patchwork::wrap_plots(partial_n_plot + partial_range_plot + partial_length_plot) +
   patchwork::plot_layout(guides = "collect") &

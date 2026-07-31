@@ -151,9 +151,9 @@ iucn_alluvial <- delta_species_trait_new |>
                                "DD" = "#D1D1C6")) +
   geom_flow(stat = "alluvium", lode.guidance = "forward", color = "darkgray") +
   geom_stratum(size = 0.1) +
-  geom_text(stat = "stratum", size = 3) + 
+  geom_text(stat = "stratum", size = 3, check_overlap = TRUE) + 
   theme_bw() +
-  labs(x = "", y = "Number of species", fill = "")
+  labs(x = "", y = "Number of species", fill = "", title = "A. With range shift")
 
 ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width = 7.5, height = 7)
 
@@ -162,7 +162,7 @@ ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width =
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
 without_migration_ensemble <- without_migration_ensemble[-which_species_to_remove]
 
-delta_species <- pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
+delta_species_without_migration <- pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
   
   future_pred_unlog <- future_pred_scale_function(data = without_migration_ensemble[i],
                                                   unit = "kg",
@@ -174,7 +174,7 @@ delta_species <- pbmcapply::pbmclapply(1:length(without_migration_ensemble), fun
     dplyr::mutate(species_name = unique(without_migration_ensemble[[i]][[1]]$species_name))
   
 }, mc.cores = parallel::detectCores() - 1)
-delta_species_bind <- do.call(rbind, delta_species) |> 
+delta_species_without_migration_bind <- do.call(rbind, delta_species_without_migration) |> 
   dplyr::mutate(model = "full")
 
 load("data/raw/1c_species_traits_final.Rdata")
@@ -185,13 +185,13 @@ species_traits_final <- species_traits_final |>
 species_traits_final <- species_traits_final[complete.cases(species_traits_final),]
 species_traits_final[species_traits_final$trophic_guild == "Herbivores Microvores Detritivores",]$trophic_guild <- "herbivores"
 
-delta_species_trait <- delta_species_bind |> 
+delta_species_trait <- delta_species_without_migration_bind |> 
   dplyr::inner_join(species_traits_final)
 
 length(unique(delta_species_trait$species_name))
 
 baseline_uicn <- species_traits_final |>
-  dplyr::filter(species_name %in% unique(delta_species_bind$species_name)
+  dplyr::filter(species_name %in% unique(delta_species_without_migration_bind$species_name)
                 # ,
                 # IUCN_category %in% c("LC", "NT")
                 # IUCN_category != c("DD")
@@ -263,9 +263,12 @@ iucn_alluvial_without_migration <- delta_species_trait_new |>
   geom_stratum(size = 0.1) +
   geom_text(stat = "stratum", size = 3, check_overlap = TRUE) + 
   theme_bw() +
-  labs(x = "", y = "Number of species", fill = "")
+  labs(x = "", y = "Number of species", fill = "", title = "B. Without range shift")
 
-ggsave(iucn_alluvial_without_migration, file = "figures/iucn_alluvial_hist_without_migration.png")
+iucn_alluvial_with_and_without_migration <- patchwork::wrap_plots(iucn_alluvial / iucn_alluvial_without_migration) +
+  patchwork::plot_layout(guides = "collect")
+
+ggsave(iucn_alluvial_with_and_without_migration, file = "figures/iucn_alluvial_with_and_without_migration.png", width = 8, height = 10)
 
 
 

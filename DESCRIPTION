@@ -1,0 +1,57 @@
+Package: Biomasse_future
+Type: Package
+Title: One-fourth of coral reef fishes at risk of extinction under future climate and socioeconomic changes
+Version: 0.0.0.9000
+Authors@R: c(
+    person(given   = "Cyril",
+           family  = "Hautecoeur",
+           role    = c("aut", "cre", "cph"),
+           email   = "hautecoeurcyril@gmail.com",
+           comment = c(ORCID = "0000-0000-0000-0000")))
+Description: Research compendium to reproduce analyses and figures of the following article: One-fourth of coral reef fishes at risk of extinction under future climate and socioeconomic changes
+URL: https://github.com/CyrilHaute/Biomasse_future
+BugReports: https://github.com/CyrilHaute/Biomasse_future/issues
+License: {{license}}
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0
+Import: 
+Imports: 
+    cito,
+    coda,
+    corrplot,
+    dplyr,
+    forcats,
+    gdistance,
+    ggalluvial,
+    ggmcmc,
+    ggnewscale,
+    ggplot2,
+    ggthemes,
+    grid,
+    Hmsc,
+    igraph,
+    jsonify,
+    magick,
+    modEvA,
+    multcompView,
+    parallel,
+    patchwork,
+    pbmcapply,
+    pdp,
+    PNWColors,
+    purrr,
+    ranger,
+    raster,
+    RColorBrewer,
+    renv,
+    rnaturalearth,
+    scales,
+    sf,
+    sjmisc,
+    stats,
+    stringr,
+    terra,
+    tidyr,
+    viridis,
+    xgboost

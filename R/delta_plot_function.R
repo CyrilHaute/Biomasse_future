@@ -1,4 +1,5 @@
-delta_plot_function <- function(delta_species_bind){
+delta_plot_function <- function(delta_species_bind,
+                                stab_y){
   
   delta_species_bind$delta_round <- round(delta_species_bind$delta)
   
@@ -20,9 +21,9 @@ delta_plot_function <- function(delta_species_bind){
                                            "SSP2-4.5" = "2",
                                            "SSP3-7.0" = "3",
                                            "SSP5-8.5" = "4"),
-                  y = dplyr::case_when(stability == "Decrease" ~ 150,
-                                       stability == "Increase" ~ 200,
-                                       stability == "Stable" ~ 175))
+                  y = dplyr::case_when(stability == "Decrease" ~ stab_y[1],
+                                       stability == "Increase" ~ stab_y[2],
+                                       stability == "Stable" ~ stab_y[3]))
   
   n_delta$scenario <- as.numeric(n_delta$scenario)
   
@@ -38,12 +39,12 @@ delta_plot_function <- function(delta_species_bind){
                                   "Stable" = RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")[c(4)],
                                   "Decrease" = RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")[c(1)])) +
     labs(x = "", y = "Biomass change (%)", color = "") +
-    theme(axis.text = element_text(size = 10),
+    theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           legend.text = element_text(size = 11), 
           legend.title = element_text(size = 10),
           strip.text.x = element_text(size = 6.5),
-          strip.text.y = element_text(size = 10)) +
+          strip.text.y = element_text(size = 12)) +
     ggnewscale::new_scale_colour() +
     geom_violin(aes(x = as.numeric(scenario), y = delta, fill = scenario), alpha = 0.5, linewidth = 0.5, show.legend = FALSE) +
     geom_hline(yintercept = 0, linetype = "dashed") +
