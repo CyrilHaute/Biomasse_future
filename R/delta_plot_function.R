@@ -1,7 +1,7 @@
 delta_plot_function <- function(delta_species_bind,
                                 stab_y){
   
-  delta_species_bind$delta_round <- round(delta_species_bind$delta)
+  delta_species_bind$delta_round <- round(delta_species_bind$delta_pr)
   
   delta_species_bind <- delta_species_bind |> 
     dplyr::mutate(stability = ifelse(delta_round %in% c(-5:5), "Stable",
@@ -34,11 +34,11 @@ delta_plot_function <- function(delta_species_bind,
     dplyr::mutate(stability = forcats::fct_relevel(stability, "Increase", "Stable", "Decrease")) |> 
     ggplot() + 
     theme_bw() + 
-    geom_point(aes(x = as.numeric(scenario), y = delta, color = stability), position = "jitter", size = 1, alpha = 0.7) +
+    geom_point(aes(x = as.numeric(scenario), y = delta_biomass, color = stability), position = "jitter", size = 1, alpha = 0.7) +
     scale_color_manual(values = c("Increase" = RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")[c(10)],
                                   "Stable" = RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")[c(4)],
                                   "Decrease" = RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")[c(1)])) +
-    labs(x = "", y = "Biomass change (%)", color = "") +
+    labs(x = "", y = "log10(Biomass change + 1)", color = "") +
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           legend.text = element_text(size = 11), 
@@ -46,12 +46,12 @@ delta_plot_function <- function(delta_species_bind,
           strip.text.x = element_text(size = 6.5),
           strip.text.y = element_text(size = 12)) +
     ggnewscale::new_scale_colour() +
-    geom_violin(aes(x = as.numeric(scenario), y = delta, fill = scenario), alpha = 0.5, linewidth = 0.5, show.legend = FALSE) +
+    geom_violin(aes(x = as.numeric(scenario), y = delta_biomass, fill = scenario), alpha = 0.5, linewidth = 0.5, show.legend = FALSE) +
     geom_hline(yintercept = 0, linetype = "dashed") +
     scale_discrete_manual(aesthetics = "fill", values = color_scale)
   
   # Test ANOVA
-  anova_result <- aov(delta ~ scenario, data = delta_species_bind)
+  anova_result <- aov(delta_biomass ~ scenario, data = delta_species_bind)
   
   # Test post-hoc Tukey
   tukey_result <- TukeyHSD(anova_result)
@@ -91,10 +91,10 @@ delta_plot_function <- function(delta_species_bind,
                                     "SSP5-8.5" = "4"))
   
   delta_species_plot_text <- delta_species_plot + 
-    geom_text(data = n_delta,
-              aes(x = scenario + 0.2, y = y, label = n, color = stability),
-              size = 5,
-              show.legend = FALSE) +
+    # geom_text(data = n_delta,
+    #           aes(x = scenario + 0.2, y = y, label = n, color = stability),
+    #           size = 5,
+    #           show.legend = FALSE) +
     scale_color_manual(values = RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")[c(1,10,4)]) +
     scale_x_continuous(breaks = 1:4, labels = c("SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5"))
   

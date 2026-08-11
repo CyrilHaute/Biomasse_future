@@ -17,7 +17,7 @@ git clone https://github.com/CyrilHaute/Biomasse_future
 ```
 
 Required dependencies can be found in the `DESCRIPTION` file and can be
-installed and load with the following function :
+installed and load with the following function:
 
 ``` ruby
 ## Install devtools package ----
@@ -29,8 +29,8 @@ devtools::install_deps(upgrade = "never")
 
 The repository is structured as follow:
 
-- `data/` : contains raw and extracted data.
-- `R/` : contains all functions.
-- `analyses/` : contains scripts to load data, run `R/` functions and reproduce figures.
-- `results/` : contains all results.
-- `figures/` : contains all figures.
+- `data/`: contains raw and extracted data.
+- `R/`: contains all functions.
+- `analyses/`: contains scripts to load data, run `R/` functions and reproduce figures.
+- `results/`: contains all results.
+- `figures/`: contains all figures.

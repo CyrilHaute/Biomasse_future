@@ -48,12 +48,38 @@ delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i)
 delta_species_bind <- do.call(rbind, delta_species) |> 
   dplyr::mutate(model = "full")
 
-max(delta_species_bind$delta)
+delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
+  
+  future_pred_unlog <- future_pred_scale_function(data = migration_ensemble[i],
+                                                  unit = "g",
+                                                  time = as.character(c("2024":"2075")), # Define the non-analogous year
+                                                  score = TRUE,
+                                                  biais = TRUE,
+                                                  mc.cores = 1)
+  
+  future_pred_unlog$biomass <- log10(future_pred_unlog$biomass + 1)
+  
+  delta_biomass <- future_pred_unlog[future_pred_unlog$year == "2075",]$biomass - future_pred_unlog[future_pred_unlog$year == "2024",]$biomass
+  delta_biomass <- data.frame(delta_biomass = delta_biomass,
+                              scenario = unique(future_pred_unlog$scenario),
+                              species_name = unique(migration_ensemble[[i]][[1]]$species_name))
+  
+  future_pred_unlog <- future_pred_unlog |> 
+    dplyr::select(delta, scenario) |> 
+    unique() |> 
+    dplyr::mutate(species_name = unique(migration_ensemble[[i]][[1]]$species_name)) |> 
+    dplyr::full_join(delta_biomass) |> 
+    dplyr::rename(delta_pr = delta)
+  
+}, mc.cores = parallel::detectCores() - 1)
+delta_species_bind <- do.call(rbind, delta_species) |> 
+  dplyr::mutate(model = "full")
+
+max(delta_species_bind$delta_pr)
 
 delta_plot <- delta_plot_function(delta_species_bind = delta_species_bind,
                                   stab_y = c(310, 400, 355)) +
-  labs(title = "A. With range shift") +
-  scale_y_continuous(limits = c(-100, round(max(delta_species_bind$delta))))
+  labs(title = "A. With range shift")
 ggsave("figures/delta_plot_plot_hist_migration.png", delta_plot, width = 9, height = 5)
 
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
