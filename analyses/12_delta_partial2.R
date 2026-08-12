@@ -51,13 +51,13 @@ delta_species_bind <- do.call(rbind, delta_species) |>
 delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
   
   future_pred_unlog <- future_pred_scale_function(data = migration_ensemble[i],
-                                                  unit = "g",
+                                                  unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = TRUE,
                                                   biais = TRUE,
                                                   mc.cores = 1)
   
-  future_pred_unlog$biomass <- log10(future_pred_unlog$biomass + 1)
+  future_pred_unlog$biomass <- log10(future_pred_unlog$biomass)
   
   delta_biomass <- future_pred_unlog[future_pred_unlog$year == "2075",]$biomass - future_pred_unlog[future_pred_unlog$year == "2024",]$biomass
   delta_biomass <- data.frame(delta_biomass = delta_biomass,
@@ -78,7 +78,7 @@ delta_species_bind <- do.call(rbind, delta_species) |>
 max(delta_species_bind$delta_pr)
 
 delta_plot <- delta_plot_function(delta_species_bind = delta_species_bind,
-                                  stab_y = c(310, 400, 355)) +
+                                  stab_y = c(0.56, 0.8, 0.68)) +
   labs(title = "A. With range shift")
 ggsave("figures/delta_plot_plot_hist_migration.png", delta_plot, width = 9, height = 5)
 
@@ -91,17 +91,29 @@ delta_species_without <- pbmcapply::pbmclapply(1:length(without_migration_ensemb
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = TRUE,
-                                                  biais = FALSE) |>
-    dplyr::select(delta, scenario) |>
-    unique() |>
-    dplyr::mutate(species_name = unique(without_migration_ensemble[[i]][[1]]$species_name))
+                                                  biais = TRUE,
+                                                  mc.cores = 1)
+  
+  future_pred_unlog$biomass <- log10(future_pred_unlog$biomass + 1)
+  
+  delta_biomass <- future_pred_unlog[future_pred_unlog$year == "2075",]$biomass - future_pred_unlog[future_pred_unlog$year == "2024",]$biomass
+  delta_biomass <- data.frame(delta_biomass = delta_biomass,
+                              scenario = unique(future_pred_unlog$scenario),
+                              species_name = unique(migration_ensemble[[i]][[1]]$species_name))
+  
+  future_pred_unlog <- future_pred_unlog |> 
+    dplyr::select(delta, scenario) |> 
+    unique() |> 
+    dplyr::mutate(species_name = unique(migration_ensemble[[i]][[1]]$species_name)) |> 
+    dplyr::full_join(delta_biomass) |> 
+    dplyr::rename(delta_pr = delta)
 
 }, mc.cores = parallel::detectCores() - 1)
 delta_species_without_bind <- do.call(rbind, delta_species_without) |>
   dplyr::mutate(model = "full")
 
 delta_plot_without <- delta_plot_function(delta_species_bind = delta_species_without_bind,
-                                          stab_y = c(85, 125, 105)) +
+                                          stab_y = c(0.2, 0.4, 0.3)) +
   labs(title = "B. Without range shift")
 delta_plot_with_without <- patchwork::wrap_plots(delta_plot / delta_plot_without) +
   patchwork::plot_layout(guides = "collect") &
@@ -164,13 +176,13 @@ summary(lm(n_future ~ geographic_range_Albouy19, data = delta_species_trait))
 
 # delta_species_trait[,colnames(delta_species_trait) %in% c("Length", "geographic_range_Albouy19", "K")] <- scale(delta_species_trait[,colnames(delta_species_trait) %in% c("Length", "geographic_range_Albouy19", "K")], center = TRUE, scale = TRUE)
 
-delta_model <- ranger::ranger(x = delta_species_trait[!colnames(delta_species_trait) %in% c("delta", "species_name", "model", "IUCN_inferred_Loiseau23")],
-                              y = unlist(delta_species_trait[colnames(delta_species_trait) %in% "delta"]),
+delta_model <- ranger::ranger(x = delta_species_trait[!colnames(delta_species_trait) %in% c("delta_pr", "delta_biomass", "species_name", "model", "IUCN_inferred_Loiseau23")],
+                              y = unlist(delta_species_trait[colnames(delta_species_trait) %in% "delta_pr"]),
                               num.trees = 1000,
                               importance = "impurity")
 
-delta_model_sensitivity_analysis <- ranger::ranger(x = delta_species_trait[!colnames(delta_species_trait) %in% c("delta", "species_name", "model", "IUCN_inferred_Loiseau23", "n_future")],
-                                                   y = unlist(delta_species_trait[colnames(delta_species_trait) %in% "delta"]),
+delta_model_sensitivity_analysis <- ranger::ranger(x = delta_species_trait[!colnames(delta_species_trait) %in% c("delta_pr", "delta_biomass", "species_name", "model", "IUCN_inferred_Loiseau23", "n_future")],
+                                                   y = unlist(delta_species_trait[colnames(delta_species_trait) %in% "delta_pr"]),
                                                    num.trees = 1000,
                                                    importance = "impurity")
 
