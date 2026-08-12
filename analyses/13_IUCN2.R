@@ -36,7 +36,7 @@ delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i)
   
   future_pred_unlog <- future_pred_scale_function(data = migration_ensemble[i],
                                                   unit = "kg",
-                                                  time = as.character(c("2024":"2075")), # Define the non-analogous year
+                                                  time = as.character(c("2024":"2054")), # Define the non-analogous year
                                                   score = TRUE,
                                                   biais = TRUE,
                                                   mc.cores = 1) |> 
