@@ -331,7 +331,7 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
   
   future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[i],
                                                                                          unit = "kg",
-                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         time = as.character(c("2024":"2075")),
                                                                                          score = TRUE,
                                                                                          biais = TRUE,
                                                                                          mc.cores = 1) |>
