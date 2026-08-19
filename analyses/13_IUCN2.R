@@ -32,11 +32,46 @@ which_species_to_remove <- which(list_species %in% species_to_remove)
 
 migration_ensemble <- migration_ensemble[-which_species_to_remove]
 
+# species <- stringr::str_replace_all(gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE)), "_", " ")
+# 
+# Generation_time_dtf <- rfishbase::popgrowth(species) |> 
+#   dplyr::select(Species,
+#                 K) |> 
+#   tidyr::drop_na() |> 
+#   dplyr::mutate(Generation_time = log(3) / K)
+# 
+# Generation_time_sum <- Generation_time_dtf |> 
+#   dplyr::group_by(Species) |> 
+#   dplyr::summarise(Generation_time = median(Generation_time))
+# 
+# taxo <- rfishbase::species(unique(species))
+# taxo <- taxo |> 
+#   dplyr::select(Species, FamCode)
+# rfish_families <- rfishbase::fb_tbl("families") |> 
+#   dplyr::select(FamCode, Family)
+# taxo <- taxo |> 
+#   dplyr::inner_join(rfish_families) |> 
+#   dplyr::select(-FamCode)
+# 
+# Generation_time_fam <- Generation_time_sum |> 
+#   dplyr::inner_join(taxo) |> 
+#   dplyr::group_by(Family) |> 
+#   dplyr::summarise(Generation_time_fam = mean(Generation_time))
+# 
+# taxo_genration_time <- taxo |> 
+#   dplyr::full_join(Generation_time_sum) |> 
+#   dplyr::full_join(Generation_time_fam) |> 
+#   dplyr::mutate(Generation_time = dplyr::case_when(is.na(Generation_time) ~ Generation_time_fam,
+#                                                    Generation_time < 1 ~ 1,
+#                                                    .default = Generation_time),
+#                 Generation_time = round(Generation_time)) |> 
+#   tidyr::drop_na()
+
 delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
   
   future_pred_unlog <- future_pred_scale_function(data = migration_ensemble[i],
                                                   unit = "kg",
-                                                  time = as.character(c("2024":"2054")), # Define the non-analogous year
+                                                  time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = TRUE,
                                                   biais = TRUE,
                                                   mc.cores = 1) |> 
@@ -85,7 +120,7 @@ baseline_uicn$freq <- as.integer(baseline_uicn$freq)
 
 baseline_uicn <- baseline_uicn |>
   dplyr::mutate(scenario = "Baseline",
-                stratum = round((freq * 100) / sum(freq)))
+                stratum = round((freq * 100) / sum(freq), 1))
 
 delta_species_trait$scenario <- as.character(delta_species_trait$scenario)
 
@@ -123,15 +158,13 @@ test2 <- delta_species_trait_new |>
   dplyr::full_join(test) |>
   dplyr::group_by(scenario, IUCN) |> 
   dplyr::summarise(freq = sum(freq)) |> 
-  dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+  dplyr::mutate(stratum = round((freq * 100) / sum(freq), 1)) |> 
   dplyr::ungroup() |>
   dplyr::full_join(baseline_uicn) |>
   dplyr::group_by(IUCN) |>
   dplyr::mutate(alluvium = dplyr::cur_group_id())
 
-delta_species_trait_new <- test2 |> 
-  dplyr::mutate(stratum = dplyr::case_when(stratum < 1 ~ NA,
-                                           stratum >= 1 ~ stratum))
+delta_species_trait_new <- test2
 
 library(ggplot2)
 library(ggalluvial)
@@ -151,9 +184,10 @@ iucn_alluvial <- delta_species_trait_new |>
                                "DD" = "#D1D1C6")) +
   geom_flow(stat = "alluvium", lode.guidance = "forward", color = "darkgray") +
   geom_stratum(size = 0.1) +
-  geom_text(stat = "stratum", size = 3, check_overlap = TRUE) + 
+  geom_text(stat = "stratum", size = 3, check_overlap = TRUE) +
   theme_bw() +
-  labs(x = "", y = "Number of species", fill = "", title = "A. With range shift")
+  labs(x = "", y = "Number of species", fill = "", title = "A. With range shift") +
+  theme(legend.position = "none")
 
 ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width = 7.5, height = 7)
 
@@ -206,7 +240,7 @@ baseline_uicn$freq <- as.integer(baseline_uicn$freq)
 
 baseline_uicn <- baseline_uicn |>
   dplyr::mutate(scenario = "Baseline",
-                stratum = round((freq * 100) / sum(freq)))
+                stratum = round((freq * 100) / sum(freq), 1))
 
 delta_species_trait$scenario <- as.character(delta_species_trait$scenario)
 
@@ -236,7 +270,7 @@ test2 <- delta_species_trait_new |>
   dplyr::full_join(test) |>
   dplyr::group_by(scenario, IUCN) |> 
   dplyr::summarise(freq = sum(freq)) |> 
-  dplyr::mutate(stratum = round((freq * 100) / sum(freq))) |> 
+  dplyr::mutate(stratum = round((freq * 100) / sum(freq), 1)) |> 
   dplyr::ungroup() |>
   dplyr::full_join(baseline_uicn) |>
   dplyr::group_by(IUCN) |>

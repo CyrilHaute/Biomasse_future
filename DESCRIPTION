@@ -45,6 +45,7 @@ Imports:
     raster,
     RColorBrewer,
     renv,
+    rfishbase,
     rnaturalearth,
     scales,
     sf,
