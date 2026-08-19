@@ -14,16 +14,16 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
-species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
-                       "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
-                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
+species_to_remove <- c("Acanthurus grammoptilus",
+                       "Amblyglyphidodon curacao", 
+                       "Chaetodon kleinii", "Chaetodon ornatissimus",
                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-                       "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
+                       "Hypoplectrus nigricans", "Lutjanus carponotatus", 
                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-                       "Parupeneus spilurus", "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", 
-                       "Plectropomus maculatus", "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-                       "Pterocaesio pisang", "Pterocaesio tile", "Scarus oviceps", "Stegastes nigricans", 
+                       "Parupeneus spilurus", "Plectorhinchus multivittatus", 
+                       "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+                       "Pterocaesio pisang", "Stegastes nigricans", 
                        "Thalassoma amblycephalum")
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
@@ -80,7 +80,7 @@ max(delta_species_bind$delta_pr)
 delta_plot <- delta_plot_function(delta_species_bind = delta_species_bind,
                                   stab_y = c(0.56, 0.8, 0.68)) +
   labs(title = "A. With range shift")
-ggsave("figures/delta_plot_plot_hist_migration.png", delta_plot, width = 9, height = 5)
+# ggsave("figures/delta_plot_plot_hist_migration.png", delta_plot, width = 9, height = 5)
 
 without_migration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
 without_migration_ensemble <- without_migration_ensemble[-which_species_to_remove]
@@ -374,13 +374,13 @@ c("herbivores_SSP1-2.6",
 
 delta_text <- data.frame(label = c("SSP1-2.6", "SSP5-8.5"),
                          x = c(4.5, 13.5),
-                         y = c(160, 160))
+                         y = c(0.9, 0.9))
 
 delta_species_trait2$trophic_guild2 <- factor(delta_species_trait2$trophic_guild2, levels = c("herbivores_SSP1-2.6",
                                                                                               "macroinvertivore_SSP1-2.6",
+                                                                                              "sessile invertivores_SSP1-2.6",
                                                                                               "corallivore_SSP1-2.6",
                                                                                               "planktivore_SSP1-2.6",
-                                                                                              "sessile invertivores_SSP1-2.6",
                                                                                               "microinvertivore_SSP1-2.6",
                                                                                               "crustacivore_SSP1-2.6",
                                                                                               "piscivore_SSP1-2.6",
@@ -396,9 +396,9 @@ delta_species_trait2$trophic_guild2 <- factor(delta_species_trait2$trophic_guild
 
 delta_species_plot <- delta_species_trait2 |> 
   ggplot() + 
-  geom_point(aes(x = trophic_guild2, y = delta), size = 0.6, position = "jitter") +
-  geom_boxplot(aes(x = trophic_guild2, y = delta, fill = trophic_guild), alpha = 0.8, size = 0.4, outlier.shape = NA) +
-  geom_text(data = delta_text, aes(x = x, y = y, label = label), size = 5) + 
+  geom_point(aes(x = trophic_guild2, y = delta_biomass), size = 0.6, position = "jitter") +
+  geom_boxplot(aes(x = trophic_guild2, y = delta_biomass, fill = trophic_guild), alpha = 0.8, size = 0.4, outlier.shape = NA) +
+  geom_text(data = delta_text, aes(x = x, y = y, label = label), size = 5) +
   theme_bw() + 
   scale_x_discrete(drop = FALSE) + 
   scale_fill_manual(values = RColorBrewer::brewer.pal(n = 8, name = "Dark2")) +
@@ -412,7 +412,7 @@ delta_species_plot <- delta_species_trait2 |>
 # Test ANOVA
 anova_data <- delta_species_trait2 |> 
   dplyr::mutate(scenario = stringr::str_replace_all(scenario, "-", ""))
-anova_result <- aov(delta ~ interaction(trophic_guild, scenario), data = anova_data)
+anova_result <- aov(delta_biomass ~ interaction(trophic_guild, scenario), data = anova_data)
 
 # Test post-hoc Tukey
 tukey_result <- TukeyHSD(anova_result)
@@ -428,7 +428,7 @@ significance_letters <- multcompView::multcompLetters(diff,
 # Choose y axis value to plot the letters
 y <- anova_data |>
   dplyr::group_by(scenario, trophic_guild) |>
-  dplyr::summarise(y = 110) |>
+  dplyr::summarise(y = 0.7) |>
   dplyr::ungroup() |> 
   dplyr::mutate(interaction = paste0(trophic_guild, ".", scenario))
 
@@ -455,10 +455,10 @@ ggsave("figures/delta_trait_plot_migration.png", delta_species_plot_text, width 
 
 delta_species_bind |> 
   dplyr::inner_join(species_traits_final) |> 
-  dplyr::filter(scenario %in% c("SSP1-2.6")) |> 
+  dplyr::filter(scenario %in% c("SSP5-8.5")) |> 
   ggplot() + 
-  geom_point(aes(x = forcats::fct_reorder(trophic_guild, delta), y = delta), size = 0.6, position = "jitter") +
-  geom_boxplot(aes(x = forcats::fct_reorder(trophic_guild, delta), y = delta, fill = trophic_guild), alpha = 0.8, size = 0.4, outlier.shape = NA) +
+  geom_point(aes(x = forcats::fct_reorder(trophic_guild, delta_biomass), y = delta_biomass), size = 0.6, position = "jitter") +
+  geom_boxplot(aes(x = forcats::fct_reorder(trophic_guild, delta_biomass), y = delta_biomass, fill = trophic_guild), alpha = 0.8, size = 0.4, outlier.shape = NA) +
   theme_bw() + 
   scale_fill_manual(values = RColorBrewer::brewer.pal(n = 8, name = "Dark2")) +
   labs(x = "", y = "Delta Biomass (%)", fill = "") +

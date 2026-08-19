@@ -24,16 +24,16 @@ scenarii <- c("ssp126", "ssp245", "ssp370", "ssp585")
 color_scale <- palette.colors()
 color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], color_scale[7]))
 
-species_to_remove <- c("Acanthurus achilles", "Acanthurus grammoptilus", "Acanthurus olivaceus", "Acanthurus pyroferus", 
-                       "Amblyglyphidodon curacao", "Canthigaster rostrata", "Centropyge bispinosa", "Centropyge vrolikii", 
-                       "Chaetodon kleinii", "Chaetodon ornatissimus", "Cheilinus chlorourus", "Cheilinus fasciatus",
+species_to_remove <- c("Acanthurus grammoptilus",
+                       "Amblyglyphidodon curacao", 
+                       "Chaetodon kleinii", "Chaetodon ornatissimus",
                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-                       "Hypoplectrus nigricans", "Lutjanus carponotatus", "Lutjanus kasmira", "Lutjanus lemniscatus", 
+                       "Hypoplectrus nigricans", "Lutjanus carponotatus", 
                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-                       "Parupeneus spilurus", "Plectorhinchus flavomaculatus", "Plectorhinchus multivittatus", 
-                       "Plectropomus maculatus", "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-                       "Pterocaesio pisang", "Pterocaesio tile", "Scarus oviceps", "Stegastes nigricans", 
+                       "Parupeneus spilurus", "Plectorhinchus multivittatus", 
+                       "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+                       "Pterocaesio pisang", "Stegastes nigricans", 
                        "Thalassoma amblycephalum")
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
@@ -453,7 +453,7 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
   
   future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[i],
                                                                                          unit = "kg",
-                                                                                         time = as.character(c("2024":"2100")),
+                                                                                         time = as.character(c("2024":"2075")),
                                                                                          score = TRUE,
                                                                                          biais = FALSE) |>
                                                          dplyr::group_by(scenario) |>
