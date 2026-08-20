@@ -161,7 +161,7 @@ migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_sc
 
 with_vs_without <- patchwork::wrap_plots(without_migration_ensemble_plot + migration_ensemble_plot)
 ggsave(with_vs_without, file = "figures/with_vs_without_pred8.png", width = 10, height = 5)
-
+ggsave(with_vs_without, file = "figures/with_vs_without_pred8.pdf", width = 10, height = 5)
 
 
 #### Plot figure SX

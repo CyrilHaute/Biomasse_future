@@ -189,7 +189,7 @@ iucn_alluvial <- delta_species_trait_new |>
   labs(x = "", y = "Number of species", fill = "", title = "A. With range shift") +
   theme(legend.position = "none")
 
-ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width = 7.5, height = 7)
+# ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width = 7.5, height = 7)
 
 
 
@@ -303,7 +303,7 @@ iucn_alluvial_with_and_without_migration <- patchwork::wrap_plots(iucn_alluvial 
   patchwork::plot_layout(guides = "collect")
 
 ggsave(iucn_alluvial_with_and_without_migration, file = "figures/iucn_alluvial_with_and_without_migration.png", width = 8, height = 10)
-
+ggsave(iucn_alluvial_with_and_without_migration, file = "figures/iucn_alluvial_with_and_without_migration.pdf", width = 8, height = 10)
 
 
 

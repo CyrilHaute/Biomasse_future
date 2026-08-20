@@ -39,22 +39,6 @@ delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i)
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = TRUE,
                                                   biais = TRUE,
-                                                  mc.cores = 1) |> 
-    dplyr::select(delta, scenario) |> 
-    unique() |> 
-    dplyr::mutate(species_name = unique(migration_ensemble[[i]][[1]]$species_name))
-  
-}, mc.cores = parallel::detectCores() - 1)
-delta_species_bind <- do.call(rbind, delta_species) |> 
-  dplyr::mutate(model = "full")
-
-delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
-  
-  future_pred_unlog <- future_pred_scale_function(data = migration_ensemble[i],
-                                                  unit = "kg",
-                                                  time = as.character(c("2024":"2075")), # Define the non-analogous year
-                                                  score = TRUE,
-                                                  biais = TRUE,
                                                   mc.cores = 1)
   
   future_pred_unlog$biomass <- log10(future_pred_unlog$biomass)
@@ -120,6 +104,7 @@ delta_plot_with_without <- patchwork::wrap_plots(delta_plot / delta_plot_without
   theme(legend.position = "bottom",
         legend.direction = "horizontal")
 ggsave("figures/delta_plot_plot_hist_with_without_migration.png", delta_plot_with_without, width = 9, height = 10)
+ggsave("figures/delta_plot_plot_hist_with_without_migration.pdf", delta_plot_with_without, width = 9, height = 10)
 
 
 load("data/raw/1c_species_traits_final.Rdata")
@@ -324,7 +309,7 @@ partial_n_plot <- partial_delta_n_bind |>
         axis.title = element_text(size = 14),
         strip.text.x = element_text(size = 12),
         strip.text.y = element_text(size = 12),
-        axis.title.y = element_text(vjust = -40))
+        axis.title.y = element_text(vjust = -30))
 
 partial_plot <- patchwork::wrap_plots(partial_n_plot + partial_range_plot + partial_length_plot) +
   patchwork::plot_layout(guides = "collect") &
@@ -335,6 +320,7 @@ partial_plot <- patchwork::wrap_plots(partial_n_plot + partial_range_plot + part
 delta_imp_partial <- patchwork::wrap_plots(delta_imp_var / partial_plot)
 
 ggsave("figures/delta_imp_partial_plot_hist_migration8.png", delta_imp_partial, width = 13, height = 12)
+ggsave("figures/delta_imp_partial_plot_hist_migration8.pdf", delta_imp_partial, width = 13, height = 12)
 ggsave("figures/delta_imp_sensitivity_analysis.png", delta_imp_var_sa, width = 10, height = 6)
 
 

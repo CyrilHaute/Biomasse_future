@@ -1,7 +1,7 @@
 load("data/extracted/rls_biomass_class.Rdata")
 load("data/raw/00_rls_surveys.Rdata")
 
-library(ggplo2)
+library(ggplot2)
 
 rescale_01 <- function(x){
   
@@ -77,7 +77,7 @@ rls_map <- ggplot() +
     axis.ticks.x = element_blank()) +
   guides(colour = guide_legend(nrow = 1))
 
-ggsave("figures/rls_map.png", rls_map)
+ggsave("figures/rls_map.pdf", rls_map)
 ggsave("figures/rls_map_legend.png", rls_map, width = 14, height = 5)
 
 
@@ -174,13 +174,20 @@ names(future_pred_ecoregion_by_realm) <- unique(test$realm)
 
 dir.create("figures/future_realm_plot_migration_point8")
 
-ggsave("figures/future_realm_plot_migration_point8/future_pred_tropical_atlantic.png", future_pred_ecoregion_by_realm[[1]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_migration_point8/future_pred_temperate_australasia.png", future_pred_ecoregion_by_realm[[2]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_migration_point8/future_pred_central_indo-pacific.png", future_pred_ecoregion_by_realm[[3]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_migration_point8/future_pred_western_indo-pacific.png", future_pred_ecoregion_by_realm[[4]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_migration_point8/future_pred_temperate_northern_atlantic.png", future_pred_ecoregion_by_realm[[5]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_migration_point8/future_pred_tropical_eastern_pacific.png", future_pred_ecoregion_by_realm[[6]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_migration_point8/future_pred_eastern_indo-pacific.png", future_pred_ecoregion_by_realm[[7]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_migration_point8/future_pred_tropical_atlantic.pdf", future_pred_ecoregion_by_realm[[1]] +
+         theme(plot.margin = margin(0, 0, 0, 0)), width = 4, height = 4)
+ggsave("figures/future_realm_plot_migration_point8/future_pred_temperate_australasia.pdf", future_pred_ecoregion_by_realm[[2]] +
+         theme(plot.margin = margin(0, 0, 0, 0)), width = 4, height = 4)
+ggsave("figures/future_realm_plot_migration_point8/future_pred_central_indo-pacific.pdf", future_pred_ecoregion_by_realm[[3]] +
+         theme(plot.margin = margin(0, 0, 0, 0)), width = 4, height = 4)
+ggsave("figures/future_realm_plot_migration_point8/future_pred_western_indo-pacific.pdf", future_pred_ecoregion_by_realm[[4]] +
+         theme(plot.margin = margin(0, 0, 0, 0)), width = 4, height = 4)
+ggsave("figures/future_realm_plot_migration_point8/future_pred_temperate_northern_atlantic.pdf", future_pred_ecoregion_by_realm[[5]] +
+         theme(plot.margin = margin(0, 0, 0, 0)), width = 4, height = 4)
+ggsave("figures/future_realm_plot_migration_point8/future_pred_tropical_eastern_pacific.pdf", future_pred_ecoregion_by_realm[[6]] +
+         theme(plot.margin = margin(0, 0, 0, 0)), width = 4, height = 4)
+ggsave("figures/future_realm_plot_migration_point8/future_pred_eastern_indo-pacific.pdf", future_pred_ecoregion_by_realm[[7]] +
+         theme(plot.margin = margin(0, 0, 0, 0)), width = 4, height = 4)
 
 
 withoutmigration_ensemble <- readRDS("results/withoutmigration_ensemble8.rds")
