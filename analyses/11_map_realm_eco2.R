@@ -127,6 +127,8 @@ which_species_to_remove <- which(list_species %in% species_to_remove)
 
 migration_ensemble <- migration_ensemble[-which_species_to_remove]
 
+test <- test |> 
+  dplyr::mutate(color_background = c("#ff7f00", "#4daf4a", "#e41a1c", "#f781bf", "#984ea3", "#a65628", "#377eb8"))
 
 future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(i) {
   
@@ -174,10 +176,11 @@ future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(
           axis.text.x = element_text(size = 14),
           axis.text.y = element_text(size = 14),
           title = element_text(size = 14),
-          plot.background = element_rect(colour = test[test$realm == realm_i,]$color,
-                                         fill = NA,
-                                         linewidth = 3))
-  
+          plot.background = element_rect(
+            colour = test[test$realm == unique(test$realm)[i],]$color_background,
+            fill = NA,
+            linewidth = 4
+          ))
   
 })
 names(future_pred_ecoregion_by_realm) <- unique(test$realm)
