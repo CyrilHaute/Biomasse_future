@@ -109,17 +109,20 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
-species_to_remove <- c("Acanthurus grammoptilus",
-                       "Amblyglyphidodon curacao", 
-                       "Chaetodon kleinii", "Chaetodon ornatissimus",
-                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
-                       "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-                       "Hypoplectrus nigricans", "Lutjanus carponotatus", 
-                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-                       "Parupeneus spilurus", "Plectorhinchus multivittatus", 
-                       "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-                       "Pterocaesio pisang", "Stegastes nigricans", 
-                       "Thalassoma amblycephalum")
+# species_to_remove <- c("Acanthurus grammoptilus",
+#                        "Amblyglyphidodon curacao", 
+#                        "Chaetodon kleinii", "Chaetodon ornatissimus",
+#                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
+#                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
+#                        "Hypoplectrus nigricans", "Lutjanus carponotatus", 
+#                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
+#                        "Parupeneus spilurus", "Plectorhinchus multivittatus", 
+#                        "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+#                        "Pterocaesio pisang", "Stegastes nigricans", 
+#                        "Thalassoma amblycephalum")
+load("data/extracted/species_to_remove_dtf.Rdata")
+species_to_remove <- species_to_remove_dtf
+species_to_remove <- unique(species_to_remove$species)
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 

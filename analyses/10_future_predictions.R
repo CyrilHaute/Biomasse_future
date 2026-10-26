@@ -24,17 +24,20 @@ scenarii <- c("ssp126", "ssp245", "ssp370", "ssp585")
 color_scale <- palette.colors()
 color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], color_scale[7]))
 
-species_to_remove <- c("Acanthurus grammoptilus",
-                       "Amblyglyphidodon curacao", 
-                       "Chaetodon kleinii", "Chaetodon ornatissimus",
-                       "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
-                       "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-                       "Hypoplectrus nigricans", "Lutjanus carponotatus", 
-                       "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-                       "Parupeneus spilurus", "Plectorhinchus multivittatus", 
-                       "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-                       "Pterocaesio pisang", "Stegastes nigricans", 
-                       "Thalassoma amblycephalum")
+# species_to_remove <- c("Acanthurus grammoptilus",
+#                        "Amblyglyphidodon curacao", 
+#                        "Chaetodon kleinii", "Chaetodon ornatissimus",
+#                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
+#                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
+#                        "Hypoplectrus nigricans", "Lutjanus carponotatus", 
+#                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
+#                        "Parupeneus spilurus", "Plectorhinchus multivittatus", 
+#                        "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
+#                        "Pterocaesio pisang", "Stegastes nigricans", 
+#                        "Thalassoma amblycephalum")
+load("data/extracted/species_to_remove_dtf.Rdata")
+species_to_remove <- species_to_remove_dtf
+species_to_remove <- unique(species_to_remove$species)
 species_to_remove <- stringr::str_replace_all(species_to_remove, " ", "_")
 list_species <- gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE))
 
@@ -389,9 +392,16 @@ ggplot2::ggsave(species_removed_example_plot_bind, filename = "figures/species_r
 
 new_dir <- "figures/species_specific_removed_migration/"
 dir.create(new_dir)
-unlist(pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_to_remove]), function(i) {
+which_species_to_remove_migration <- species_to_remove_dtf |> 
+  dplyr::filter(range_shift == "with") |> 
+  dplyr::select(species) |> 
+  unique() |> 
+  unlist() |> 
+  stringr::str_replace_all(" ", "_")
+which_species_to_remove_migration <- which(list_species %in% which_species_to_remove_migration)
+unlist(pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_to_remove_migration]), function(i) {
   
-  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[which_species_to_remove][i],
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[which_species_to_remove_migration][i],
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
                                                                                          score = TRUE,
@@ -402,8 +412,8 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_to_remove
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
                                                                        biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
                                                          dplyr::ungroup(),
-                                                       group_name = unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
-                                                       title = unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       group_name = unique(migration_ensemble[which_species_to_remove_migration][[i]][[1]]$species_name),
+                                                       title = unique(migration_ensemble[which_species_to_remove_migration][[i]][[1]]$species_name),
                                                        x_name = "",
                                                        y_name = "Biomass (kg)",
                                                        color_lab = "",
@@ -412,14 +422,23 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_to_remove
                                                        breaks = c(2024, 2050, 2100),
                                                        color_scale = color_scale)
   
-  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(migration_ensemble[which_species_to_remove][[i]][[1]]$species_name), ".png"))
+  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(migration_ensemble[which_species_to_remove_migration][[i]][[1]]$species_name), ".png"))
   
 }, mc.cores = parallel::detectCores() - 1))
+
+
 new_dir <- "figures/species_specific_removed_without_migration/"
 dir.create(new_dir)
-unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble[which_species_to_remove]), function(i) {
+which_species_to_remove_withoutmigration <- species_to_remove_dtf |> 
+  dplyr::filter(range_shift == "without") |> 
+  dplyr::select(species) |> 
+  unique() |> 
+  unlist() |> 
+  stringr::str_replace_all(" ", "_")
+which_species_to_remove_withoutmigration <- which(list_species %in% which_species_to_remove_withoutmigration)
+unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble[which_species_to_remove_withoutmigration]), function(i) {
   
-  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[which_species_to_remove][i],
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = without_migration_ensemble[which_species_to_remove_withoutmigration][i],
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
                                                                                          score = TRUE,
@@ -430,8 +449,8 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble[which_species_t
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
                                                                        biomass = (1 - (biomass / dplyr::first(biomass))) * - 100) |>
                                                          dplyr::ungroup(),
-                                                       group_name = unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
-                                                       title = unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name),
+                                                       group_name = unique(without_migration_ensemble[which_species_to_remove_withoutmigration][[i]][[1]]$species_name),
+                                                       title = unique(without_migration_ensemble[which_species_to_remove_withoutmigration][[i]][[1]]$species_name),
                                                        x_name = "",
                                                        y_name = "Biomass (kg)",
                                                        color_lab = "",
@@ -440,7 +459,7 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble[which_species_t
                                                        breaks = c(2024, 2050, 2100),
                                                        color_scale = color_scale)
   
-  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[which_species_to_remove][[i]][[1]]$species_name), ".png"))
+  ggsave(future_pred_unlog, filename = paste0(new_dir, unique(without_migration_ensemble[which_species_to_remove_withoutmigration][[i]][[1]]$species_name), ".png"))
   
 }, mc.cores = parallel::detectCores() - 1))
 
@@ -477,15 +496,14 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble), function(i) {
 
 
 
-#### Extract projection for Cheilinus undulatus, Anampses twistii and Abudefduf vaigiensis
+#### Extract projection for Caranx melampygus, Anampses twistii and Abudefduf vaigiensis
 
-sapply(1:length(migration_ensemble), function(i) {  unique(migration_ensemble[[i]][[1]]$species_name) })
+saved_species <- c("Caranx_melampygus", "Anampses_twistii", "Abudefduf_vaigiensis")
+which_saved_species <- which(list_species %in% saved_species)
 
-saved_species <- c(88, 44, 6)
-
-plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
+plot_species <- pbmcapply::pbmclapply(1:length(which_saved_species), function(i) {
   
-  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[saved_species[i]],
+  future_pred_unlog <- plot_future_pred_scale_function(data = future_pred_scale_function(data = migration_ensemble[which_saved_species[i]],
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2075")),
                                                                                          score = TRUE,
@@ -497,8 +515,8 @@ plot_species <- pbmcapply::pbmclapply(1:length(saved_species), function(i) {
                                                                        biomass = (1 - (biomass / dplyr::first(biomass))) * -100) |>
                                                          dplyr::ungroup(),
                                                        ncol = 3,
-                                                       group_name = unique(migration_ensemble[[saved_species[i]]][[1]]$species_name),
-                                                       title = unique(migration_ensemble[[saved_species[i]]][[1]]$species_name),
+                                                       group_name = unique(migration_ensemble[[which_saved_species[i]]][[1]]$species_name),
+                                                       title = unique(migration_ensemble[[which_saved_species[i]]][[1]]$species_name),
                                                        x_name = "",
                                                        y_name = "Biomass change (%)",
                                                        color_lab = "",
@@ -519,9 +537,9 @@ c_me_plot <- ggplot() + annotation_custom(grid::rasterGrob(c_me), xmin = -Inf, x
 a_tw_plot <- ggplot() + annotation_custom(grid::rasterGrob(a_tw), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
 a_va_plot <- ggplot() + annotation_custom(grid::rasterGrob(a_va), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + theme_void()
 
-plot_species_patch <- patchwork::wrap_plots(((plot_species[[1]] + c_me_plot) /
+plot_species_patch <- patchwork::wrap_plots(((plot_species[[3]] + c_me_plot) /
                                                (plot_species[[2]] + a_tw_plot) /
-                                               (plot_species[[3]] + a_va_plot)))
+                                               (plot_species[[1]] + a_va_plot)))
 
 ggsave(plot_species_patch, filename = "figures/plot_species_patch_migration8.png", width = 7, height = 10)
 
@@ -541,12 +559,13 @@ delta_realm_s_migration <- delta_realm_migration |>
   unique() |>
   dplyr::group_split(scenario)
 
-delta_realm_without_migration <- future_pred_scale_function(data = without_migration_ensemble[-c(375, 380)],
+delta_realm_without_migration <- future_pred_scale_function(data = without_migration_ensemble[-which_species_to_remove],
                                                             unit = "kg",
                                                             time = as.character(c("2024":"2075")),
                                                             scale = "realm",
                                                             to_remove = 0,
-                                                            score = TRUE)
+                                                            score = TRUE,
+                                                            biais = FALSE)
 delta_realm_s_without_migration <- delta_realm_without_migration |>
   dplyr::ungroup() |>
   dplyr::select(scale, delta, scenario) |>
@@ -554,6 +573,8 @@ delta_realm_s_without_migration <- delta_realm_without_migration |>
   dplyr::group_split(scenario)
 
 
+
+############ Relative importance of climate change and human pressures ############
 
 load("results/ensemble_model_hist_full.Rdata")
 load("results/ensemble_model_env_hist.Rdata")
