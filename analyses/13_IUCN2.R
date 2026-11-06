@@ -187,10 +187,12 @@ iucn_alluvial <- delta_species_trait_new |>
                                "DD" = "#D1D1C6")) +
   geom_flow(stat = "alluvium", lode.guidance = "forward", color = "darkgray") +
   geom_stratum(size = 0.1) +
-  geom_text(stat = "stratum", size = 3, check_overlap = TRUE) +
+  geom_text(stat = "stratum", size = 3.5, check_overlap = TRUE) +
   theme_bw() +
   labs(x = "", y = "Number of species", fill = "", title = "A. With range shift") +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
 
 # ggsave(iucn_alluvial, file = "figures/iucn_alluvial_hist_migration.png", width = 7.5, height = 7)
 
@@ -298,15 +300,17 @@ iucn_alluvial_without_migration <- delta_species_trait_new |>
                                "DD" = "#D1D1C6")) +
   geom_flow(stat = "alluvium", lode.guidance = "forward", color = "darkgray") +
   geom_stratum(size = 0.1) +
-  geom_text(stat = "stratum", size = 3, check_overlap = TRUE) + 
+  geom_text(stat = "stratum", size = 3.5, check_overlap = TRUE) + 
   theme_bw() +
-  labs(x = "", y = "Number of species", fill = "", title = "B. Without range shift")
+  labs(x = "", y = "Number of species", fill = "", title = "B. Without range shift") +
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
 
 iucn_alluvial_with_and_without_migration <- patchwork::wrap_plots(iucn_alluvial / iucn_alluvial_without_migration) +
   patchwork::plot_layout(guides = "collect")
 
 ggsave(iucn_alluvial_with_and_without_migration, file = "figures/iucn_alluvial_with_and_without_migration.png", width = 8, height = 10)
-ggsave(iucn_alluvial_with_and_without_migration, file = "figures/iucn_alluvial_with_and_without_migration.pdf", width = 8, height = 10)
+ggsave(iucn_alluvial_with_and_without_migration, file = "figures/iucn_alluvial_with_and_without_migration.pdf", units = "mm", width = 210, height = 297)
 
 
 

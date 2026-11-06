@@ -536,8 +536,8 @@ plot_future_pred_scale_function <- function(data,
                                             color_scale,
                                             model_scenario = FALSE,
                                             face = "plain",
-                                            axis.text.x = 10,
-                                            axis.text.y = 10,
+                                            axis.text.x = 12,
+                                            axis.text.y = 12,
                                             legend.position,
                                             delta = TRUE){
   
