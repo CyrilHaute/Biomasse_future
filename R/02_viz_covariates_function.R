@@ -12,14 +12,7 @@ plot_data <- function(data,
     tidyr::pivot_longer(cols = -c("survey_id", "longitude", "latitude", "scenario", "model"),
                         names_to = "year",
                         values_to = "value")
-  
-  # data_pivot_scenario <- data_mean_scenario_model |> 
-  #   dplyr::group_by(scenario, year) |> 
-  #   dplyr::summarise(mean_value = mean(value),
-  #                    se = sd(value),
-  #                    lower = mean_value - se,
-  #                    upper = mean_value + se)
-  
+
   data_pivot_scenario <- data_mean_scenario_model |> 
     dplyr::group_by(scenario, year) |> 
     dplyr::summarise(mean_value = mean(value),

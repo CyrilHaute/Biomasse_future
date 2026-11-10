@@ -1,18 +1,3 @@
-# load("data/raw/00_rls_surveys.Rdata")
-# 
-# rls_surveys <- rls_surveys |> 
-#   dplyr::filter(latitude < 35 & latitude > -35)
-# 
-# rls_surveys_xy <- rls_surveys |>
-#   dplyr::select(longitude, latitude) |>
-#   terra::vect(geom = c("longitude", "latitude"), crs = "WGS84")
-# 
-# point_to_extract = rls_surveys
-# name_id = "survey_id"
-# name_longitude = "longitude"
-# name_latitude = "latitude"
-# data_to_extract_path = dhw[i]
-# name_covariates = "DHW_q99"
 
 covariates_extract_function <- function(point_to_extract,
                                         name_id,
@@ -116,9 +101,7 @@ covariates_extract_function <- function(point_to_extract,
 }
 
 
-# point_to_extract = "data/extracted/mask.shp"
-# data_to_extract_path = chl[i]
-# name_covariates = "chl"
+
 
 
 covariates_extract_function_ext <- function(point_to_extract,
