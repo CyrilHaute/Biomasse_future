@@ -29,8 +29,11 @@ devtools::install_deps(upgrade = "never")
 
 The repository is structured as follow:
 
-- `data/`: contains raw and extracted data.
+- `data/`: the `data` file can be found at this [Zenodo](https://zenodo.org/) link: https://zenodo.org/records/24105253.
+It contains all raw and derived data to reproduce the analysis in open access.
 - `R/`: contains all functions.
 - `analyses/`: contains scripts to load data, run `R/` functions and reproduce figures.
-- `results/`: contains all results.
+- `results/`: contains all results. 
+The results miss the ensemble model files (**migration_ensemble8.rds** and **withoutmigration_ensemble8.rds**) as they are heavy. They can
+be easily reproduce with the `analyses/12_future_predictions.R` file.
 - `figures/`: contains all figures.

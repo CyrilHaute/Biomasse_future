@@ -52,4 +52,5 @@ rsconnect/
 results/migration_ensemble8.rds
 results/withoutmigration_ensemble8.rds
 data/
+data.zip
 results/biomass_baseline_future_hist8
