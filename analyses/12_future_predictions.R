@@ -24,17 +24,6 @@ scenarii <- c("ssp126", "ssp245", "ssp370", "ssp585")
 color_scale <- palette.colors()
 color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], color_scale[7]))
 
-# species_to_remove <- c("Acanthurus grammoptilus",
-#                        "Amblyglyphidodon curacao", 
-#                        "Chaetodon kleinii", "Chaetodon ornatissimus",
-#                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
-#                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-#                        "Hypoplectrus nigricans", "Lutjanus carponotatus", 
-#                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-#                        "Parupeneus spilurus", "Plectorhinchus multivittatus", 
-#                        "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-#                        "Pterocaesio pisang", "Stegastes nigricans", 
-#                        "Thalassoma amblycephalum")
 load("data/extracted/species_to_remove_dtf.Rdata")
 species_to_remove <- species_to_remove_dtf
 species_to_remove <- unique(species_to_remove$species)
@@ -143,8 +132,7 @@ migration_ensemble_plot <- plot_future_pred_scale_function(data = future_pred_sc
                                                                                              unit = "kg",
                                                                                              time = as.character(c("2024":"2075")),
                                                                                              score = TRUE,
-                                                                                             biais = TRUE,
-                                                                                             mc.cores = parallel::detectCores() - 1) |> 
+                                                                                             biais = TRUE) |> 
                                                              dplyr::group_by(scenario) |> 
                                                              dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                            upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -167,7 +155,7 @@ ggsave(with_vs_without, file = "figures/with_vs_without_pred8.png", width = 10, 
 ggsave(with_vs_without, file = "figures/with_vs_without_pred8.pdf", width = 10, height = 5)
 
 
-#### Plot figure SX
+#### Plot figure S14
 
 rf_plot <- plot_future_pred_scale_function(data = future_pred_scale_function(data = biomass_class_future_rf_hist_migration8_full[-which_species_to_remove],
                                                                              unit = "kg",
@@ -336,8 +324,7 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble), function(i) {
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2075")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE,
-                                                                                         mc.cores = 1) |>
+                                                                                         biais = TRUE) |>
                                                          dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -364,8 +351,7 @@ species_removed_example_plot <- pbmcapply::pbmclapply(1:length(migration_ensembl
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE,
-                                                                                         mc.cores = 1) |>
+                                                                                         biais = TRUE) |>
                                                          dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -405,8 +391,7 @@ unlist(pbmcapply::pbmclapply(1:length(migration_ensemble[which_species_to_remove
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE,
-                                                                                         mc.cores = 1) |>
+                                                                                         biais = TRUE) |>
                                                          dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -442,8 +427,7 @@ unlist(pbmcapply::pbmclapply(1:length(without_migration_ensemble[which_species_t
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2100")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE,
-                                                                                         mc.cores = 1) |>
+                                                                                         biais = TRUE) |>
                                                          dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * - 100,
@@ -507,8 +491,7 @@ plot_species <- pbmcapply::pbmclapply(1:length(which_saved_species), function(i)
                                                                                          unit = "kg",
                                                                                          time = as.character(c("2024":"2075")),
                                                                                          score = TRUE,
-                                                                                         biais = TRUE,
-                                                                                         mc.cores = parallel::detectCores() - 1) |>
+                                                                                         biais = TRUE) |>
                                                          dplyr::group_by(scenario) |>
                                                          dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * -100,
                                                                        upper = (1 - (upper / dplyr::first(biomass))) * -100,
@@ -543,34 +526,6 @@ plot_species_patch <- patchwork::wrap_plots(((plot_species[[3]] + c_me_plot) /
 
 ggsave(plot_species_patch, filename = "figures/plot_species_patch_migration8.png", width = 7, height = 10)
 
-
-
-delta_realm_migration <- future_pred_scale_function(data = migration_ensemble[-which_species_to_remove],
-                                                    unit = "kg",
-                                                    time = as.character(c("2024":"2075")),
-                                                    scale = "realm",
-                                                    to_remove = 0,
-                                                    score = TRUE,
-                                                    biais = TRUE,
-                                                    mc.cores = parallel::detectCores() - 1)
-delta_realm_s_migration <- delta_realm_migration |>
-  dplyr::ungroup() |>
-  dplyr::select(scale, delta, scenario) |>
-  unique() |>
-  dplyr::group_split(scenario)
-
-delta_realm_without_migration <- future_pred_scale_function(data = without_migration_ensemble[-which_species_to_remove],
-                                                            unit = "kg",
-                                                            time = as.character(c("2024":"2075")),
-                                                            scale = "realm",
-                                                            to_remove = 0,
-                                                            score = TRUE,
-                                                            biais = FALSE)
-delta_realm_s_without_migration <- delta_realm_without_migration |>
-  dplyr::ungroup() |>
-  dplyr::select(scale, delta, scenario) |>
-  unique() |>
-  dplyr::group_split(scenario)
 
 
 
@@ -687,5 +642,4 @@ summary_delta <- delta_species_all |>
 delta_plot_model <- delta_plot_function_model(delta_species_all = delta_species_all) +
   scale_y_continuous(limits = c(-100, 100))
 ggsave("figures/delta_plot_model_hist.png", delta_plot_model, width = 9, height = 5)
-
 

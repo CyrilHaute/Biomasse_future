@@ -16,17 +16,6 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
-# species_to_remove <- c("Acanthurus grammoptilus",
-#                        "Amblyglyphidodon curacao", 
-#                        "Chaetodon kleinii", "Chaetodon ornatissimus",
-#                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
-#                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-#                        "Hypoplectrus nigricans", "Lutjanus carponotatus", 
-#                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-#                        "Parupeneus spilurus", "Plectorhinchus multivittatus", 
-#                        "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-#                        "Pterocaesio pisang", "Stegastes nigricans", 
-#                        "Thalassoma amblycephalum")
 load("data/extracted/species_to_remove_dtf.Rdata")
 species_to_remove <- species_to_remove_dtf
 species_to_remove <- unique(species_to_remove$species)

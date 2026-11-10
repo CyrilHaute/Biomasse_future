@@ -17,13 +17,13 @@ rls_surveys <- rls_surveys |>
 test <- rls_surveys |> 
   dplyr::select(realm) |> 
   unique() |> 
-  dplyr::mutate(color = c("#ff7f00",
-                          "#4daf4a",
-                          "#e41a1c",
-                          "#f781bf",
-                          "#984ea3",
-                          "#a65628",
-                          "#377eb8"))
+  dplyr::mutate(color = c("#0072B2",
+                          "#E69F00",
+                          "#CC79A7",
+                          "#56B4E9",
+                          "#D55E00",
+                          "#009E73",
+                          "#F0E442"))
 
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sv")
 
@@ -72,7 +72,7 @@ library(ggthemes)
 rls_map <- ggplot() +
   geom_sf(data = realm_sf, aes(color = REALM), fill = alpha("white", 0), linewidth = 1) +
   geom_sf(data = world_sf, color = NA) +
-  scale_color_manual(values = RColorBrewer::brewer.pal(n = 9, name = "Set1")[-6]) +
+  scale_color_manual(values = test$color) +
   coord_sf(ylim = c(-35, 35), expand = FALSE) +
   labs(title = "", color = "") +
   theme_tufte() +
@@ -109,17 +109,6 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
-# species_to_remove <- c("Acanthurus grammoptilus",
-#                        "Amblyglyphidodon curacao", 
-#                        "Chaetodon kleinii", "Chaetodon ornatissimus",
-#                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
-#                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-#                        "Hypoplectrus nigricans", "Lutjanus carponotatus", 
-#                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-#                        "Parupeneus spilurus", "Plectorhinchus multivittatus", 
-#                        "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-#                        "Pterocaesio pisang", "Stegastes nigricans", 
-#                        "Thalassoma amblycephalum")
 load("data/extracted/species_to_remove_dtf.Rdata")
 species_to_remove <- species_to_remove_dtf
 species_to_remove <- unique(species_to_remove$species)
@@ -131,7 +120,8 @@ which_species_to_remove <- which(list_species %in% species_to_remove)
 migration_ensemble <- migration_ensemble[-which_species_to_remove]
 
 test <- test |> 
-  dplyr::mutate(color_background = c("#ff7f00", "#4daf4a", "#e41a1c", "#f781bf", "#984ea3", "#a65628", "#377eb8"))
+  dplyr::mutate(color_background = c("#D55E00", "#CC79A7", "#0072B2", "#F0E442", "#56B4E9", "#009E73", "#E69F00"))
+
 
 future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(i) {
   
@@ -157,11 +147,17 @@ future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(
                                      time = as.character(c("2024":"2075")),
                                      scale = "realm",
                                      score = TRUE,
-                                     to_remove = 0,
-                                     biais = TRUE,
-                                     mc.cores = parallel::detectCores() - 1)
+                                     biais = TRUE)
   
-  data |> 
+  # Tropical Atlantic (n = 275)
+  # Temperate Australasia (n = 151)
+  # Central Indo-Pacific (n = 4003)
+  # Western Indo-Pacific (n = 119)
+  # Temperate Northern Atlantic (n = 218)
+  # Tropical Eastern Pacific (n = 368)
+  # Eastern Indo-Pacific (n = 293)
+  
+  plot_realm <- data |> 
     dplyr::filter(year %in% c(2024, 2030, 2050, 2075)) |> 
     dplyr::group_by(scenario, scale) |> 
     dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
@@ -185,6 +181,8 @@ future_pred_ecoregion_by_realm <- lapply(1:length(unique(test$realm)), function(
             linewidth = 4
           ))
   
+  return(plot_realm)
+
 })
 names(future_pred_ecoregion_by_realm) <- unique(test$realm)
 
@@ -226,10 +224,9 @@ future_pred_ecoregion_by_realm_without <- lapply(1:length(unique(test$realm)), f
                                      time = as.character(c("2024":"2075")),
                                      scale = "realm",
                                      score = TRUE,
-                                     to_remove = 0,
                                      biais = FALSE)
   
-  data |> 
+  plot_realm <- data |> 
     dplyr::filter(year %in% c(2024, 2030, 2050, 2075)) |> 
     dplyr::group_by(scenario, scale) |> 
     dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
@@ -246,7 +243,14 @@ future_pred_ecoregion_by_realm_without <- lapply(1:length(unique(test$realm)), f
     theme(legend.position = "none",
           axis.text.x = element_text(size = 14),
           axis.text.y = element_text(size = 14),
-          title = element_text(size = 14))
+          title = element_text(size = 14),
+          plot.background = element_rect(
+            colour = test[test$realm == unique(test$realm)[i],]$color_background,
+            fill = NA,
+            linewidth = 4
+          ))
+  
+  return(plot_realm)
   
   
 })
@@ -254,23 +258,21 @@ names(future_pred_ecoregion_by_realm_without) <- unique(test$realm)
 
 dir.create("figures/future_realm_plot_without_migration_point")
 
-ggsave("figures/future_realm_plot_without_migration_point/future_pred_tropical_atlantic.png", future_pred_ecoregion_by_realm_without[[1]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_without_migration_point/future_pred_temperate_australasia.png", future_pred_ecoregion_by_realm_without[[2]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_without_migration_point/future_pred_central_indo-pacific.png", future_pred_ecoregion_by_realm_without[[3]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_without_migration_point/future_pred_western_indo-pacific.png", future_pred_ecoregion_by_realm_without[[4]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_without_migration_point/future_pred_temperate_northern_atlantic.png", future_pred_ecoregion_by_realm_without[[5]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_without_migration_point/future_pred_tropical_eastern_pacific.png", future_pred_ecoregion_by_realm_without[[6]], width = 4, height = 4)
-ggsave("figures/future_realm_plot_without_migration_point/future_pred_eastern_indo-pacific.png", future_pred_ecoregion_by_realm_without[[7]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_without_migration_point/future_pred_tropical_atlantic.pdf", future_pred_ecoregion_by_realm_without[[1]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_without_migration_point/future_pred_temperate_australasia.pdf", future_pred_ecoregion_by_realm_without[[2]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_without_migration_point/future_pred_central_indo-pacific.pdf", future_pred_ecoregion_by_realm_without[[3]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_without_migration_point/future_pred_western_indo-pacific.pdf", future_pred_ecoregion_by_realm_without[[4]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_without_migration_point/future_pred_temperate_northern_atlantic.pdf", future_pred_ecoregion_by_realm_without[[5]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_without_migration_point/future_pred_tropical_eastern_pacific.pdf", future_pred_ecoregion_by_realm_without[[6]], width = 4, height = 4)
+ggsave("figures/future_realm_plot_without_migration_point/future_pred_eastern_indo-pacific.pdf", future_pred_ecoregion_by_realm_without[[7]], width = 4, height = 4)
 
 
 delta_realm_migration <- future_pred_scale_function(data = migration_ensemble[-which_species_to_remove],
                                                     unit = "kg",
                                                     time = as.character(c("2024":"2075")),
                                                     scale = "realm",
-                                                    to_remove = 0,
                                                     score = TRUE,
-                                                    biais = TRUE,
-                                                    mc.cores = parallel::detectCores() - 1)
+                                                    biais = TRUE)
 delta_realm_s_migration <- delta_realm_migration |> 
   dplyr::ungroup() |> 
   dplyr::select(scale, delta, scenario) |> 
@@ -281,10 +283,8 @@ delta_realm_without_migration <- future_pred_scale_function(data = withoutmigrat
                                                             unit = "kg",
                                                             time = as.character(c("2024":"2075")),
                                                             scale = "realm",
-                                                            to_remove = 0,
                                                             score = TRUE,
-                                                            biais = FALSE,
-                                                            mc.cores = parallel::detectCores() - 1)
+                                                            biais = FALSE)
 delta_realm_s_without_migration <- delta_realm_without_migration |> 
   dplyr::ungroup() |> 
   dplyr::select(scale, delta, scenario) |> 

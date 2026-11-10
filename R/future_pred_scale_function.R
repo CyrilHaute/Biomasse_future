@@ -1,16 +1,11 @@
 
 future_pred_scale_function <- function(data,
                                        scale = "",
-                                       all_species = FALSE,
                                        group_name = NULL,
-                                       group_by = NULL,
-                                       group_by_data,
                                        unit,
                                        time,
                                        score = FALSE,
-                                       to_remove,
-                                       biais,
-                                       mc.cores){
+                                       biais){
   
   # scale = ""
   # all_species = FALSE
@@ -23,16 +18,6 @@ future_pred_scale_function <- function(data,
     sc_i <- lapply(data, '[[', i)
     
     sc_i <- do.call(rbind, sc_i)
-    
-    if(!is.null(group_name) & is.null(group_by)){
-      
-      if(unique(sc_i$species_name) != group_name){
-        
-        stop("argument `species_name` different to species name in input data")
-        
-      }
-      
-    }
 
     if(score == FALSE){
       
@@ -55,12 +40,7 @@ future_pred_scale_function <- function(data,
         dplyr::mutate(dplyr::across(`2024`:`2100`, ~ dplyr::case_when(. > max(decile_save$biomass_class) ~ 29,
                                                                       . < min(decile_save$biomass_class) ~ 0,
                                                                       TRUE ~ .)))
-      
-      # sc_i <- sc_i |>
-      #   dplyr::filter(
-      #     dplyr::if_all(`2024`:`2100`, ~ .x >= 0 & .x <= 29)
-      #   )
-      
+
       sc_i <- sc_i |>
         dplyr::select(-biomass)
       
@@ -89,292 +69,71 @@ future_pred_scale_function <- function(data,
           dplyr::mutate(dplyr::across(`2024`:`2100`, ~ dplyr::case_when(. < 0 ~ 0,
                                                                         TRUE ~ .)))
         
-        # sum_biomass <- pbmcapply::pbmclapply(1:length("2024":"2100"), function(j) {
-        # 
-        #   # data.frame(year = c("2024":"2100")[j],
-        #   #            sum_biomass = sum(sc_i[colnames(sc_i) %in% c("2024":"2100")[j]]))
-        # 
-        #   data_year_j <- sc_i[colnames(sc_i) %in% c("species_name", c("2024":"2100")[j])] |>
-        #     dplyr::mutate(year = c("2024":"2100")[j])
-        #   colnames(data_year_j)[2] <- "biomass"
-        #   data_year_j <- data_year_j |>
-        #     dplyr::group_by(year, species_name) |>
-        #     dplyr::mutate(sum_biomass = sum(biomass)) |>
-        #     dplyr::select(-biomass) |>
-        #     unique()
-        # 
-        # }, mc.cores = mc.cores)
-        # sum_biomass_bind <- do.call(rbind, sum_biomass)
-        # 
-        # # year_to_correct <- sum_biomass_bind |>
-        # #   dplyr::filter(sum_biomass <= 0) |>
-        # #   dplyr::select(year) |>
-        # #   unlist()
-        # 
-        # year_sp_to_correct <- sum_biomass_bind |>
-        #   dplyr::filter(sum_biomass <= 0) |>
-        #   dplyr::select(year, species_name)
-        # 
-        # if(nrow(year_sp_to_correct) != 0) {
-        # 
-        #   test <- lapply(1:length(unique(year_sp_to_correct$species_name)), function(j) {
-        # 
-        #     sp_j <- sc_i |>
-        #       dplyr::filter(species_name == unique(year_sp_to_correct$species_name)[j])
-        # 
-        #     sp_j[,colnames(sp_j) %in% year_sp_to_correct[year_sp_to_correct$species_name == unique(year_sp_to_correct$species_name)[j],]$year] <- as.data.frame(apply(sp_j[,colnames(sp_j) %in% year_sp_to_correct[year_sp_to_correct$species_name == unique(year_sp_to_correct$species_name)[j],]$year], 2, function(v) v - sum(v) / length(v)))
-        # 
-        #   })
-        # 
-        #   for(j in 1:length(test)) {
-        # 
-        #     sc_i[sc_i$species_name == unique(year_sp_to_correct$species_name)[j],][,colnames(sc_i) %in% year_sp_to_correct[year_sp_to_correct$species_name == unique(year_sp_to_correct$species_name)[j],]$year] <- test[[j]]
-        # 
-        #   }
-        # 
-        # }
-        
-        
-        # if(length(year_to_correct) != 0) {
-        #   
-        #   sc_i[,colnames(sc_i) %in% year_to_correct] <- as.data.frame(apply(sc_i[,colnames(sc_i) %in% year_to_correct], 2, function(v) v - sum(v) / length(v)))
-        #   
-        # }
-
       }
       
       sc_i <- sc_i[,!colnames(sc_i) %in% c("scenario", "model")]
       
     }
-
-    if(all_species == TRUE){
+    
+    
+    if(scale == ""){
       
-      if(scale == ""){
-        
-        if(is.null(group_by)){
-          
-          sc_i <- sc_i |>
-            dplyr::group_by(species_name) |>
-            dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |>
-            dplyr::mutate(delta = (get(time[length(time)]) * 100 / get(time[1])) - 100) |>
-            tidyr::pivot_longer(time, names_to = "year", values_to = "biomass") |>
-            dplyr::mutate(scenario = scenarii[i])
-          
-        }else{
-          
-          sc_i <- sc_i |> 
-            dplyr::left_join(group_by_data)
-          
-          colnames(sc_i)[colnames(sc_i) == group_by] <- "group_by"
-          
-          if(is.null(group_name)){
-            
-            sc_i <- sc_i |> 
-              dplyr::group_by(group_by) |> 
-              dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |>
-              tidyr::pivot_longer(time, names_to = "year", values_to = "biomass") |>
-              dplyr::mutate(scenario = scenarii[i])
-            
-          }else{
-            
-            sc_i <- sc_i |> 
-              dplyr::group_by(species_name, group_by) |> 
-              dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |>
-              dplyr::mutate(delta = (get(time[length(time)]) * 100 / get(time[1])) - 100) |>
-              tidyr::pivot_longer(time, names_to = "year", values_to = "biomass") |>
-              dplyr::mutate(scenario = scenarii[i])
-            
-          }
-          
-        }
-        
-      }else{
-        
-        sc_i <- sc_i |> 
-          dplyr::inner_join(rls_surveys[,which(colnames(rls_surveys) %in% c("survey_id", scale))])
-        colnames(sc_i)[length(colnames(sc_i))] <- "scale"
-        
-        sc_i <- sc_i |> 
-          dplyr::group_by(species_name, scale) |> 
-          dplyr::summarise(dplyr::across(dplyr::all_of(time), sum))
-        
-        sc_i <- sc_i |> 
-          tidyr::pivot_longer(-c("species_name", scale), names_to = "year", values_to = "biomass") |> 
-          dplyr::mutate(scenario = scenarii[i])
-        
-      }
+      n_transect <- length(unique(sc_i$survey_id))
+      
+      sc_i <- sc_i |> 
+        tidyr::pivot_longer(cols = -c("survey_id", "species_name"),
+                            names_to = "year",
+                            values_to = "value") |> 
+        dplyr::filter(year %in% time)
+      
+      sc_i <- sc_i |> 
+        dplyr::group_by(year) |> 
+        dplyr::summarise(biomass = sum(value),
+                         var_sum = sum((value - mean(value))^2) / (n_transect - 1),
+                         se_sum = sqrt(n_transect * var_sum),
+                         t_value = qt(0.975, df = n_transect - 1),
+                         lower = biomass - t_value * se_sum,
+                         upper = biomass + t_value * se_sum)
+      
+      delta <- (sc_i[sc_i$year == time[length(time)],]$biomass * 100) / sc_i[sc_i$year == time[1],]$biomass - 100
+      
+      sc_i <- sc_i |> 
+        dplyr::mutate(delta = delta,
+                      scenario = scenarii[i],
+                      model = unique(data[[1]][[1]]$model))
       
     }else{
       
-      if(scale == ""){
-        
-        if(is.null(group_by)){
-
-          # sc_i <- sc_i |>
-          #   dplyr::group_by(survey_id) |>
-          #   dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |>
-          #   dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |>
-          #   dplyr::mutate(delta = (get(time[length(time)]) * 100 / get(time[1])) - 100) |>
-          #   tidyr::pivot_longer(time, names_to = "year", values_to = "biomass") |>
-          #   dplyr::mutate(scenario = scenarii[i],
-          #                 model = unique(data[[1]][[1]]$model))
-          
-          
-          sc_i <- sc_i |> 
-            tidyr::pivot_longer(cols = -c("survey_id", "species_name"),
-                                names_to = "year",
-                                values_to = "value") |> 
-            dplyr::filter(year %in% time)
-          
-          # sc_i <- sc_i |> 
-          #   dplyr::group_by(year) |> 
-          #   dplyr::summarise(biomass = mean(value),
-          #                    se = sd(value) / sqrt(dplyr::n()),
-          #                    lower = biomass - qt(0.975, df = dplyr::n() - 1) * se,
-          #                    upper = biomass + qt(0.975, df = dplyr::n() - 1) * se)
-          sc_i <- sc_i |> 
-            dplyr::group_by(year) |> 
-            dplyr::summarise(biomass = sum(value),
-                             var_sum = sum((value - mean(value))^2) / (dplyr::n() - 1),
-                             se_sum = sqrt(dplyr::n() * var_sum),
-                             t_value = qt(0.975, df = dplyr::n() - 1),
-                             lower = biomass - t_value * se_sum,
-                             upper = biomass + t_value * se_sum)
-          
-          delta <- (sc_i[sc_i$year == time[length(time)],]$biomass * 100) / sc_i[sc_i$year == time[1],]$biomass - 100
-
-          sc_i <- sc_i |> 
-            dplyr::mutate(delta = delta,
-                          scenario = scenarii[i],
-                          model = unique(data[[1]][[1]]$model))
-          
-
-        }else{
-          
-          sc_i <- sc_i |> 
-            dplyr::left_join(group_by_data)
-          
-          sc_i <- sc_i[complete.cases(sc_i),]
-          
-          colnames(sc_i)[colnames(sc_i) == group_by] <- "group_by"
-          
-          if(is.null(group_name)){
-            # 
-            # sc_i <- sc_i |>
-            #   dplyr::group_by(group_by) |>
-            #   dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |>
-            #   dplyr::mutate(delta = (get(time[length(time)]) * 100 / get(time[1])) - 100) |>
-            #   tidyr::pivot_longer(time, names_to = "year", values_to = "biomass") |>
-            #   dplyr::mutate(scenario = scenarii[i])
-            
-            sc_i <- sc_i |> 
-            tidyr::pivot_longer(cols = -c("survey_id", "species_name", "group_by"),
-                                names_to = "year",
-                                values_to = "value") |> 
-            dplyr::filter(year %in% time)
-          
-          # sc_i <- sc_i |> 
-          #   dplyr::group_by(year) |> 
-          #   dplyr::summarise(biomass = mean(value),
-          #                    se = sd(value) / sqrt(dplyr::n()),
-          #                    lower = biomass - qt(0.975, df = dplyr::n() - 1) * se,
-          #                    upper = biomass + qt(0.975, df = dplyr::n() - 1) * se)
-          sc_i <- sc_i |> 
-            dplyr::group_by(year, group_by) |> 
-            dplyr::summarise(biomass = sum(value),
-                             var_sum = sum((value - mean(value))^2) / (dplyr::n() - 1),
-                             se_sum = sqrt(dplyr::n() * var_sum),
-                             t_value = qt(0.975, df = dplyr::n() - 1),
-                             lower = biomass - t_value * se_sum,
-                             upper = biomass + t_value * se_sum)
-          
-          delta <- (sc_i[sc_i$year == time[length(time)],]$biomass * 100) / sc_i[sc_i$year == time[1],]$biomass - 100
-          
-          sc_i <- sc_i |> 
-            dplyr::mutate(delta = delta,
-                          scenario = scenarii[i],
-                          model = unique(data[[1]][[1]]$model))
-
-          }else{
-            
-            sc_i <- sc_i |> 
-              dplyr::group_by(group_by) |> 
-              dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |>
-              dplyr::mutate(delta = (get(time[length(time)]) * 100 / get(time[1])) - 100) |>
-              tidyr::pivot_longer(time, names_to = "year", values_to = "biomass") |>
-              dplyr::mutate(scenario = scenarii[i])
-            
-          }
-          
-        }
-        
-      }else{
-        
-        if(scale == "survey_id") {
-          
-          sc_i <- sc_i
-          colnames(sc_i)[colnames(sc_i) == "survey_id"] <- "scale"
-          
-          sc_i <- sc_i |> 
-            tidyr::pivot_longer(cols = -c("species_name", "scale"),
-                                names_to = "year",
-                                values_to = "value") |> 
-            dplyr::filter(year %in% time)
-          
-        }else{
-          
-          sc_i <- sc_i |> 
-            dplyr::inner_join(rls_surveys[,which(colnames(rls_surveys) %in% c("survey_id", scale))])
-          colnames(sc_i)[length(colnames(sc_i))] <- "scale"
-          
-          sc_i <- sc_i |> 
-            tidyr::pivot_longer(cols = -c("survey_id", "species_name", "scale"),
-                                names_to = "year",
-                                values_to = "value") |> 
-            dplyr::filter(year %in% time)
-          
-        }
-
-        # to_remove <- sc_i |> 
-        #   dplyr::select(survey_id, scale) |> 
-        #   unique() |> 
-        #   dplyr::group_by(scale) |> 
-        #   dplyr::summarise(n = dplyr::n()) |> 
-        #   dplyr::filter(n > to_remove)
-        # 
-        # sc_i <- sc_i |> 
-        #   dplyr::filter(scale %in% to_remove$scale)
-        
-        # scale <- sc_i
-        
-        sc_i <- sc_i |> 
-          dplyr::group_by(year, scale) |> 
-          dplyr::summarise(biomass = sum(value),
-                           var_sum = sum((value - mean(value))^2) / (dplyr::n() - 1),
-                           se_sum = sqrt(dplyr::n() * var_sum),
-                           t_value = qt(0.975, df = dplyr::n() - 1),
-                           lower = biomass - t_value * se_sum,
-                           upper = biomass + t_value * se_sum)
-        
-        delta <- (sc_i[sc_i$year == time[length(time)],]$biomass * 100) / sc_i[sc_i$year == time[1],]$biomass - 100
-        
-        sc_i <- sc_i |> 
-          dplyr::mutate(delta = delta,
-                        scenario = scenarii[i])
-
-        # sc_i <- sc_i |> 
-        #   dplyr::group_by(scale) |> 
-        #   dplyr::summarise(dplyr::across(dplyr::all_of(time), sum)) |> 
-        #   dplyr::mutate(delta = (get(time[length(time)]) * 100 / get(time[1])) - 100)
-        # 
-        # sc_i <- sc_i |> 
-        #   tidyr::pivot_longer(!c(scale, "delta"), names_to = "year", values_to = "biomass") |> 
-        #   dplyr::mutate(scenario = scenarii[i])
-
-      }
+      n_transect <- length(unique(sc_i$survey_id))
+      
+      sc_i <- sc_i |> 
+        dplyr::inner_join(rls_surveys[,which(colnames(rls_surveys) %in% c("survey_id", scale))])
+      colnames(sc_i)[length(colnames(sc_i))] <- "scale"
+      
+      sc_i <- sc_i |> 
+        tidyr::pivot_longer(cols = -c("survey_id", "species_name", "scale"),
+                            names_to = "year",
+                            values_to = "value") |> 
+        dplyr::filter(year %in% time)
+      
+      sc_i <- sc_i |> 
+        dplyr::group_by(year, scale) |> 
+        dplyr::summarise(biomass = sum(value),
+                         var_sum = sum((value - mean(value))^2) / (n_transect - 1),
+                         se_sum = sqrt(n_transect * var_sum),
+                         t_value = qt(0.975, df = n_transect - 1),
+                         lower = biomass - t_value * se_sum,
+                         upper = biomass + t_value * se_sum)
+      
+      delta <- (sc_i[sc_i$year == time[length(time)],]$biomass * 100) / sc_i[sc_i$year == time[1],]$biomass - 100
+      
+      sc_i <- sc_i |> 
+        dplyr::mutate(delta = delta,
+                      scenario = scenarii[i],
+                      n_transect = n_transect)
       
     }
-    
+
     sc_i$year <- as.integer(sc_i$year)
     sc_i$scenario <- as.factor(sc_i$scenario)
     

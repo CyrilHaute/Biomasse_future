@@ -14,17 +14,6 @@ color_scale <- as.character(c(color_scale[4], color_scale[3], color_scale[5], co
 
 migration_ensemble <- readRDS("results/migration_ensemble8.rds")
 
-# species_to_remove <- c("Acanthurus grammoptilus",
-#                        "Amblyglyphidodon curacao", 
-#                        "Chaetodon kleinii", "Chaetodon ornatissimus",
-#                        "Chromis cyanea", "Epinephelus daemelii", "Fistularia commersonii", 
-#                        "Gnathodentex aureolineatus", "Goniistius vestitus", "Hologymnosus annulatus", 
-#                        "Hypoplectrus nigricans", "Lutjanus carponotatus", 
-#                        "Neoglyphidodon nigroris", "Neoglyphidodon polyacanthus", "Novaculichthys taeniourus", 
-#                        "Parupeneus spilurus", "Plectorhinchus multivittatus", 
-#                        "Pomacentrus milleri", "Pomacentrus reidi", "Pseudanthias huchtii", 
-#                        "Pterocaesio pisang", "Stegastes nigricans", 
-#                        "Thalassoma amblycephalum")
 load("data/extracted/species_to_remove_dtf.Rdata")
 species_to_remove <- species_to_remove_dtf
 species_to_remove <- unique(species_to_remove$species)
@@ -35,8 +24,8 @@ which_species_to_remove <- which(list_species %in% species_to_remove)
 
 migration_ensemble <- migration_ensemble[-which_species_to_remove]
 
-# species <- stringr::str_replace_all(gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE)), "_", " ")
-# 
+species <- stringr::str_replace_all(gsub(".Rdata", "", list.files("results/biomass_class_future_rf_hist_migration8_full", full.names = FALSE)), "_", " ")
+
 # Generation_time_dtf <- rfishbase::popgrowth(species) |> 
 #   dplyr::select(Species,
 #                 K) |> 
@@ -76,8 +65,7 @@ delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i)
                                                   unit = "kg",
                                                   time = as.character(c("2024":"2075")), # Define the non-analogous year
                                                   score = TRUE,
-                                                  biais = TRUE,
-                                                  mc.cores = 1) |> 
+                                                  biais = TRUE) |> 
     dplyr::select(delta, scenario) |> 
     unique() |> 
     dplyr::mutate(species_name = unique(migration_ensemble[[i]][[1]]$species_name))
