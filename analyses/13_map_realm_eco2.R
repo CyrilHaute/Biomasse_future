@@ -293,4 +293,3 @@ delta_realm_s_without_migration <- delta_realm_without_migration |>
 
 delta_realm_s_migration <- delta_realm_s_migration |> 
   dplyr::mutate(delta_with_without = abs(delta_realm_s_without_migration$delta - delta_realm_s_migration$delta))
-

@@ -12,8 +12,7 @@ delta_species <- pbmcapply::pbmclapply(1:length(migration_ensemble), function(i)
                                                   unit = "kg",
                                                   time = as.character(c("2025":"2075")), # Define the non-analogous year
                                                   score = TRUE,
-                                                  biais = TRUE,
-                                                  mc.cores = 1) |> 
+                                                  biais = TRUE) |> 
     dplyr::mutate(sp = unique(migration_ensemble[[i]][[1]]$species_name))
   
   any_true_i <- lapply(1:4, function(i) {
@@ -51,8 +50,7 @@ delta_species_without <- pbmcapply::pbmclapply(1:length(without_migration_ensemb
                                                   unit = "kg",
                                                   time = as.character(c("2025":"2075")), # Define the non-analogous year
                                                   score = TRUE,
-                                                  biais = TRUE,
-                                                  mc.cores = 1) |> 
+                                                  biais = TRUE) |> 
     dplyr::mutate(sp = unique(without_migration_ensemble[[i]][[1]]$species_name))
   
   any_true_i <- lapply(1:4, function(i) {
