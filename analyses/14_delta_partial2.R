@@ -353,7 +353,7 @@ c("herbivores_SSP1-2.6",
 
 delta_text <- data.frame(label = c("SSP1-2.6", "SSP5-8.5"),
                          x = c(4.5, 13.5),
-                         y = c(0.9, 0.9))
+                         y = c(160, 160))
 
 delta_species_trait2$trophic_guild2 <- factor(delta_species_trait2$trophic_guild2, levels = c("herbivores_SSP1-2.6",
                                                                                               "macroinvertivore_SSP1-2.6",
@@ -375,8 +375,8 @@ delta_species_trait2$trophic_guild2 <- factor(delta_species_trait2$trophic_guild
 
 delta_species_plot <- delta_species_trait2 |> 
   ggplot() + 
-  geom_point(aes(x = trophic_guild2, y = delta_biomass), size = 0.6, position = "jitter") +
-  geom_boxplot(aes(x = trophic_guild2, y = delta_biomass, fill = trophic_guild), alpha = 0.8, size = 0.4, outlier.shape = NA) +
+  geom_point(aes(x = trophic_guild2, y = delta_pr), size = 0.6, position = "jitter") +
+  geom_boxplot(aes(x = trophic_guild2, y = delta_pr, fill = trophic_guild), alpha = 0.8, size = 0.4, outlier.shape = NA) +
   geom_text(data = delta_text, aes(x = x, y = y, label = label), size = 5) +
   theme_bw() + 
   scale_x_discrete(drop = FALSE) + 

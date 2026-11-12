@@ -285,8 +285,7 @@ migration_ensemble_plot_all <- plot_future_pred_scale_function(data = future_pre
                                                                                                  unit = "kg",
                                                                                                  time = as.character(c("2024":"2075")),
                                                                                                  score = TRUE,
-                                                                                                 biais = TRUE,
-                                                                                                 mc.cores = parallel::detectCores() - 1) |> 
+                                                                                                 biais = TRUE) |> 
                                                                  dplyr::group_by(scenario) |> 
                                                                  dplyr::mutate(lower = (1 - (lower / dplyr::first(biomass))) * - 100,
                                                                                upper = (1 - (upper / dplyr::first(biomass))) * - 100,

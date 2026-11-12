@@ -1,5 +1,7 @@
 # Biomasse_future
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24160074.svg)](https://doi.org/10.5281/zenodo.24160074)
+
 Research compendium to reproduce analyses and figures of the following article:
 
 Cyril Hautecoeur, Ulysse Flandrin, Martin Paquet, Jerry Tjiputra, Ella Clausius,
